@@ -1,0 +1,959 @@
+:root {
+  color: #16201d;
+  background: #eef2ef;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.appShell {
+  width: min(1120px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.topBar {
+  padding: 10px 0 26px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand svg {
+  flex: 0 0 auto;
+  color: #247b63;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.brand p,
+.eyebrow,
+.metricPanel span,
+dt {
+  color: #65736f;
+}
+
+.brand p {
+  margin-top: 3px;
+  font-size: 0.92rem;
+}
+
+.mainNav,
+.topBarActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mainNav {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.navButton {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #43504c;
+  padding: 0 12px;
+  font-weight: 750;
+}
+
+.activeNavButton {
+  border-color: #b8d8cd;
+  background: #dff0ea;
+  color: #1d664f;
+}
+
+.languageSelect {
+  display: inline-flex;
+  align-items: center;
+  color: #65736f;
+  font-size: 0.8rem;
+}
+
+.languageSelect select,
+input,
+.createUserForm select,
+.usersTableRow select {
+  min-height: 42px;
+  border: 1px solid #c4cfca;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #16201d;
+}
+
+.languageSelect select {
+  padding: 0 10px;
+}
+
+.authLayout {
+  display: grid;
+  min-height: calc(100vh - 140px);
+  align-items: center;
+  gap: 18px;
+}
+
+.inlineAuthLayout {
+  min-height: 0;
+}
+
+.panel {
+  border: 1px solid #d4ddd9;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(27, 42, 37, 0.08);
+}
+
+.compactPanel {
+  padding: 24px;
+}
+
+.loginPanel {
+  display: grid;
+  width: min(420px, 100%);
+  margin: 0 auto;
+  padding: 22px;
+  gap: 16px;
+}
+
+.loginPanel label {
+  display: grid;
+  gap: 7px;
+  color: #43504c;
+  font-weight: 650;
+}
+
+.formIntro {
+  display: grid;
+  gap: 6px;
+}
+
+.formIntro p,
+.hintText {
+  color: #65736f;
+}
+
+.formActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 0 12px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 92px;
+  border: 1px solid #c4cfca;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #16201d;
+  padding: 10px 12px;
+  font: inherit;
+  resize: vertical;
+}
+
+.primaryButton {
+  display: inline-grid;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 0;
+  border-radius: 6px;
+  background: #247b63;
+  color: #ffffff;
+  font-weight: 750;
+}
+
+.iconTextButton {
+  grid-auto-flow: column;
+  gap: 8px;
+}
+
+.secondaryButton {
+  min-height: 44px;
+  border: 1px solid #c4cfca;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24312d;
+  font-weight: 750;
+}
+
+.dashboard {
+  display: grid;
+  gap: 18px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 8px;
+}
+
+.accountMenu {
+  position: relative;
+}
+
+.accountButton {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  border: 1px solid #c4cfca;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24312d;
+  padding: 0 10px 0 12px;
+  text-align: left;
+}
+
+.accountButton span {
+  display: grid;
+  gap: 1px;
+}
+
+.accountButton small {
+  color: #65736f;
+  font-size: 0.72rem;
+}
+
+.accountMenuPanel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  width: 220px;
+  border: 1px solid #d4ddd9;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(27, 42, 37, 0.14);
+  padding: 6px;
+}
+
+.accountMenuPanel button {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #24312d;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.accountMenuPanel button:hover {
+  background: #eef2ef;
+}
+
+.iconButton {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #c4cfca;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24312d;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.statusPanel,
+.metricPanel {
+  padding: 18px;
+}
+
+.widePanel {
+  grid-column: 1 / -1;
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #247b63;
+  font-weight: 800;
+}
+
+.statusPanel strong {
+  display: block;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
+}
+
+dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+dl div {
+  display: grid;
+  gap: 2px;
+}
+
+dt {
+  font-size: 0.82rem;
+}
+
+dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.metricPanel {
+  display: grid;
+  min-height: 112px;
+  align-content: space-between;
+}
+
+.metricPanel strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.dashboardMachineGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dashboardMachineButton {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  min-height: 86px;
+  border: 1px solid #d4ddd9;
+  border-left-width: 5px;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24312d;
+  padding: 11px 12px;
+  text-align: left;
+}
+
+.dashboardMachineButton span,
+.dashboardMachineButton small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dashboardMachineButton span {
+  color: #65736f;
+}
+
+.dashboardMachineButton:not(:disabled):hover {
+  border-color: #151d1a;
+  background: #edf2f0;
+}
+
+.errorText,
+.successText,
+.warningText {
+  border-radius: 6px;
+  padding: 11px 12px;
+}
+
+.errorText {
+  background: #ffe8e4;
+  color: #9a2d1e;
+}
+
+.successText {
+  background: #e4f8ee;
+  color: #17613c;
+}
+
+.warningText {
+  display: grid;
+  gap: 4px;
+  background: #fff5d7;
+  color: #765410;
+}
+
+.apiList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: #43504c;
+}
+
+.temporaryPasswordPanel {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.temporaryPasswordPanel code {
+  display: block;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #16201d;
+  color: #ffffff;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+
+.copyBlock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.temporaryPasswordPanel p:last-child {
+  color: #65736f;
+}
+
+.adminPanel {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.createUserForm {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(150px, 220px) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.createUserForm label {
+  display: grid;
+  gap: 7px;
+  color: #43504c;
+  font-weight: 650;
+}
+
+.createUserForm select,
+.usersTableRow select {
+  width: 100%;
+  padding: 0 10px;
+}
+
+.usersTable {
+  display: grid;
+  overflow-x: auto;
+}
+
+.usersTableHeader,
+.usersTableRow,
+.enrollmentTableHeader,
+.enrollmentTableRow {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  min-width: 880px;
+  padding: 10px 0;
+}
+
+.usersTableHeader,
+.enrollmentTableHeader {
+  border-bottom: 1px solid #d4ddd9;
+  color: #65736f;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.usersTableHeader,
+.usersTableRow {
+  grid-template-columns: minmax(220px, 1.4fr) minmax(140px, 0.7fr) minmax(150px, 0.7fr) minmax(170px, 0.8fr) 96px;
+}
+
+.enrollmentTableHeader,
+.enrollmentTableRow {
+  grid-template-columns: minmax(220px, 1.2fr) minmax(160px, 0.85fr) minmax(160px, 0.85fr) minmax(180px, 1fr) minmax(160px, 0.85fr);
+}
+
+.usersTableRow,
+.enrollmentTableRow {
+  border-bottom: 1px solid #edf1ef;
+}
+
+.userNameCell {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.userNameCell span {
+  overflow: hidden;
+  color: #65736f;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.dangerButton {
+  color: #9a2d1e;
+}
+
+.dangerActionButton {
+  display: inline-grid;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid #b94a3b;
+  border-radius: 6px;
+  background: #b94a3b;
+  color: #ffffff;
+  padding: 0 14px;
+  font-weight: 750;
+}
+
+.dangerActionButton:not(:disabled):hover {
+  background: #9f3528;
+  border-color: #9f3528;
+}
+
+.machinesLayout {
+  display: grid;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.machineListPanel {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.machineList {
+  display: grid;
+  gap: 8px;
+}
+
+.machineListItem {
+  display: grid;
+  gap: 3px;
+  border: 1px solid #d4ddd9;
+  border-left-width: 5px;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24312d;
+  padding: 11px 12px;
+  text-align: left;
+}
+
+.machineListItem span,
+.compactListItem span,
+.compactListItem small {
+  color: #65736f;
+}
+
+.machineStatusLabel {
+  color: #394743;
+  font-weight: 850;
+}
+
+.onlineMachineListItem {
+  border-color: #7db8a5;
+  border-left-color: #247b63;
+}
+
+.offlineMachineListItem {
+  border-color: #e0b4ad;
+  border-left-color: #b94a3b;
+}
+
+.unknownMachineListItem {
+  border-left-color: #8c9894;
+}
+
+.activeMachineListItem {
+  color: #13211d;
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+
+.activeMachineListItem span,
+.activeMachineListItem .machineStatusLabel {
+  color: inherit;
+}
+
+.activeMachineListItem.onlineMachineListItem {
+  border-color: #1f6c57;
+  background: #c7eadc;
+}
+
+.activeMachineListItem.offlineMachineListItem {
+  border-color: #9f3c30;
+  background: #f4d5d0;
+}
+
+.activeMachineListItem.unknownMachineListItem {
+  border-color: #66726e;
+  background: #e5ebe8;
+}
+
+.wakePanel,
+.powerCyclePanel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 14px;
+  border-color: #b7d8ca;
+  background: #f2faf6;
+  padding: 18px;
+}
+
+.actionPanel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.wakePanel h2 {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+}
+
+.wakeButton {
+  min-width: 178px;
+}
+
+.powerCycleGrid,
+.scriptButtonMatrix {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.powerButton,
+.scriptMatrixButton {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  gap: 8px;
+  min-height: 92px;
+  border: 1px solid #151d1a;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #121a17;
+  font-weight: 750;
+  text-align: center;
+}
+
+.powerButton:disabled,
+.scriptMatrixButton:disabled {
+  border-color: #cbd3d0;
+  background: #f3f5f4;
+  color: #8d9995;
+  opacity: 1;
+}
+
+.powerButton:not(:disabled):hover,
+.scriptMatrixButton:not(:disabled):hover {
+  border-color: #000000;
+  background: #edf2f0;
+}
+
+.dangerPowerButton:not(:disabled):hover {
+  border-color: #d6978d;
+  background: #fff1ef;
+  color: #8b2618;
+}
+
+.adminConfigGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.75fr);
+  gap: 16px;
+}
+
+.machineSubNav {
+  display: flex;
+  gap: 8px;
+}
+
+.subNavButton {
+  min-height: 38px;
+  border: 1px solid #c4cfca;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #43504c;
+  padding: 0 14px;
+  font-weight: 750;
+}
+
+.activeSubNavButton {
+  border-color: #7db8a5;
+  background: #e4f4ee;
+  color: #1b735b;
+}
+
+.configListItem {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.configListItem .rowActions {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.rowActions {
+  display: flex;
+  gap: 6px;
+}
+
+.machineDetail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.machineSummaryPanel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+}
+
+.machineSummaryDetails {
+  min-width: 0;
+}
+
+.compactList,
+.commandForms,
+.commandForm {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.compactListItem {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  border-bottom: 1px solid #edf1ef;
+  padding: 8px 0;
+}
+
+.compactListItem strong,
+.compactListItem span,
+.compactListItem small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.statusCheckList {
+  display: grid;
+  gap: 8px;
+}
+
+.statusCheckItem {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.statusCheckItem strong,
+.statusCheckItem small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.statusCheckItem small {
+  color: #65736f;
+  font-size: 0.78rem;
+}
+
+.statusCheckDot {
+  margin-top: 0.34rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.healthyStatusCheckDot {
+  background: #247b63;
+}
+
+.unhealthyStatusCheckDot {
+  background: #b94a3b;
+}
+
+.undefinedStatusCheckDot {
+  background: #8c9894;
+}
+
+.commandActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.commandForms {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.commandForm {
+  align-content: start;
+}
+
+.singleCommandForm {
+  grid-template-columns: 1fr;
+}
+
+.commandForm label {
+  display: grid;
+  gap: 7px;
+  color: #43504c;
+  font-weight: 650;
+}
+
+.scriptParameterGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.checkboxField {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  min-height: 42px;
+}
+
+.checkboxField input {
+  width: auto;
+}
+
+@media (max-width: 720px) {
+  .appShell {
+    padding: 14px;
+  }
+
+  .topBar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    align-items: flex-start;
+  }
+
+  .brand p {
+    max-width: 210px;
+  }
+
+  .mainNav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .topBarActions {
+    margin-left: auto;
+  }
+
+  .accountButton span {
+    display: none;
+  }
+
+  .statusGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .machinesLayout,
+  .machineDetail,
+  .machineSummaryPanel,
+  .commandForms,
+  .adminConfigGrid,
+  .dashboardMachineGrid,
+  .powerCycleGrid,
+  .scriptButtonMatrix,
+  .scriptParameterGrid,
+  .wakePanel,
+  .powerCyclePanel {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions,
+  .createUserForm {
+    grid-template-columns: 1fr;
+  }
+
+  .copyBlock {
+    grid-template-columns: 1fr;
+  }
+}

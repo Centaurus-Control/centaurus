@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: centaurus-agent
+
+logging:
+  file:
+    name: ${CENTAURUS_AGENT_LOG_PATH:./logs/centaurus-agent.log}
+
+server:
+  address: ${CENTAURUS_AGENT_UI_BIND_ADDRESS:127.0.0.1}
+  port: ${CENTAURUS_AGENT_UI_PORT:8787}
+
+centaurus:
+  agent:
+    config-path: ${CENTAURUS_AGENT_CONFIG_PATH:./agent/agent-data/config.yml}
+    version: ${CENTAURUS_AGENT_VERSION:0.1.0-SNAPSHOT}
+    connection:
+      auto-connect: ${CENTAURUS_AGENT_AUTO_CONNECT:true}
+      reconnect-delay-seconds: ${CENTAURUS_AGENT_RECONNECT_DELAY_SECONDS:10}
+    local-ui:
+      remote-access-enabled: ${CENTAURUS_AGENT_UI_REMOTE_ACCESS_ENABLED:false}

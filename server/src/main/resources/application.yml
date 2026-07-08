@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: centaurus-server
+
+  datasource:
+    url: ${CENTAURUS_DB_URL}
+    username: ${CENTAURUS_DB_USERNAME}
+    password: ${CENTAURUS_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${CENTAURUS_JPA_DDL_AUTO:validate}
+    open-in-view: false
+
+  flyway:
+    enabled: ${CENTAURUS_FLYWAY_ENABLED:true}
+    baseline-on-migrate: ${CENTAURUS_FLYWAY_BASELINE_ON_MIGRATE:true}
+    baseline-version: ${CENTAURUS_FLYWAY_BASELINE_VERSION:1}
+    locations: classpath:db/migration
+
+server:
+  port: ${CENTAURUS_SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+centaurus:
+  auth:
+    access-token-ttl: ${CENTAURUS_AUTH_ACCESS_TOKEN_TTL:15m}
+    refresh-token-ttl: ${CENTAURUS_AUTH_REFRESH_TOKEN_TTL:365d}
+    refresh-cookie-name: ${CENTAURUS_AUTH_REFRESH_COOKIE_NAME:centaurus_refresh_token}
+    refresh-cookie-secure-mode: ${CENTAURUS_AUTH_REFRESH_COOKIE_SECURE_MODE:AUTO}
+    jwt-secret: ${CENTAURUS_AUTH_JWT_SECRET:}
+  bootstrap:
+    admin:
+      username: ${CENTAURUS_BOOTSTRAP_ADMIN_USERNAME:admin}
+      password: ${CENTAURUS_BOOTSTRAP_ADMIN_PASSWORD:}
+  enrollment:
+    token-ttl: ${CENTAURUS_ENROLLMENT_TOKEN_TTL:1h}
+    server-url: ${CENTAURUS_ENROLLMENT_SERVER_URL:http://localhost:8080}
+    ws-url: ${CENTAURUS_ENROLLMENT_WS_URL:ws://localhost:8080/agent/ws}

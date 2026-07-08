@@ -1,0 +1,991 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Centaurus Agent</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f5f7fa;
+            --panel: #ffffff;
+            --line: #d8dee8;
+            --text: #172033;
+            --muted: #657084;
+            --accent: #1769aa;
+            --danger: #b42318;
+            --ok: #087443;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            border-bottom: 1px solid var(--line);
+            background: var(--panel);
+        }
+
+        .header-inner,
+        main {
+            width: min(1180px, calc(100vw - 32px));
+            margin: 0 auto;
+        }
+
+        .header-inner {
+            min-height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+            letter-spacing: 0;
+        }
+
+        h1 {
+            font-size: 20px;
+        }
+
+        h2 {
+            font-size: 16px;
+        }
+
+        h3 {
+            font-size: 14px;
+        }
+
+        main {
+            padding: 20px 0 32px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 16px;
+        }
+
+        section,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        section {
+            padding: 16px;
+        }
+
+        .stack {
+            display: grid;
+            gap: 16px;
+            align-content: start;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 700;
+            margin: 12px 0 6px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            min-height: 38px;
+            border: 1px solid #b9c3d2;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font: inherit;
+            color: var(--text);
+            background: #fff;
+        }
+
+        textarea {
+            min-height: 92px;
+            resize: vertical;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        button {
+            min-height: 36px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+        }
+
+        button.secondary {
+            background: #fff;
+            color: var(--text);
+            border-color: #b9c3d2;
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        button:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #edf0f5;
+            padding-bottom: 7px;
+        }
+
+        .status-item span:first-child {
+            color: var(--muted);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 22px;
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            background: #eef2f7;
+            color: #42526a;
+        }
+
+        .pill.ok {
+            color: var(--ok);
+            background: #e7f6ef;
+        }
+
+        .pill.bad {
+            color: var(--danger);
+            background: #fdeceb;
+        }
+
+        .script-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .script-item {
+            width: 100%;
+            text-align: left;
+            background: #fff;
+            color: var(--text);
+            border: 1px solid var(--line);
+            display: grid;
+            gap: 3px;
+            min-height: 54px;
+        }
+
+        .script-item.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 12px;
+        }
+
+        .span-2 {
+            grid-column: span 2;
+        }
+
+        pre {
+            margin: 12px 0 0;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            border-radius: 6px;
+            padding: 10px;
+            background: #111827;
+            color: #e5e7eb;
+            font-size: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: end;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .38);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 20;
+        }
+
+        .modal {
+            width: min(760px, 100%);
+            max-height: min(720px, calc(100vh - 32px));
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        .modal-header,
+        .modal-path {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .file-list {
+            overflow: auto;
+            padding: 8px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .file-entry {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 28px 1fr auto;
+            gap: 8px;
+            align-items: center;
+            text-align: left;
+            background: #fff;
+            color: var(--text);
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+
+        .file-entry:hover {
+            border-color: var(--line);
+        }
+
+        .file-entry .muted {
+            text-align: right;
+        }
+
+        .builder {
+            display: grid;
+            gap: 8px;
+        }
+
+        .builder-row {
+            display: grid;
+            grid-template-columns: 1fr 130px 88px 1fr auto;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .argument-row {
+            grid-template-columns: 150px 1fr 1fr auto auto auto;
+        }
+
+        .builder-row input,
+        .builder-row select {
+            min-height: 34px;
+        }
+
+        .icon-button {
+            width: 36px;
+            min-height: 34px;
+            padding: 0;
+        }
+
+        @media (max-width: 840px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .span-2 {
+                grid-column: span 1;
+            }
+
+            .builder-row,
+            .argument-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <h1>Centaurus Agent</h1>
+        <div class="row">
+            <span id="authPill" class="pill bad">Locked</span>
+            <button id="logoutButton" class="secondary hidden" type="button">Logout</button>
+        </div>
+    </div>
+</header>
+<main>
+    <div class="stack">
+        <section id="loginPanel">
+            <div class="toolbar">
+                <h2>Login</h2>
+            </div>
+            <label for="serverUrl">Server URL</label>
+            <input id="serverUrl" placeholder="http://localhost:8080">
+            <label for="username">Username</label>
+            <input id="username" value="admin" autocomplete="username">
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password">
+            <button id="loginButton" type="button">Login</button>
+        </section>
+
+        <section>
+            <div class="toolbar">
+                <h2>Status</h2>
+                <button id="refreshStatusButton" class="secondary" type="button">Refresh</button>
+            </div>
+            <div id="statusGrid" class="status-grid"></div>
+        </section>
+
+        <section>
+            <div class="toolbar">
+                <h2>Enrollment</h2>
+            </div>
+            <label for="bundle">Enrollment bundle</label>
+            <textarea id="bundle" spellcheck="false"></textarea>
+            <label for="displayName">Display name</label>
+            <input id="displayName">
+            <button id="enrollButton" type="button">Enroll</button>
+        </section>
+    </div>
+
+    <div class="stack">
+        <section>
+            <div class="toolbar">
+                <h2>Scripts</h2>
+                <div class="row">
+                    <button id="newScriptButton" class="secondary" type="button">New</button>
+                    <button id="publishManifestButton" class="secondary" type="button">Publish</button>
+                </div>
+            </div>
+            <div id="scriptList" class="script-list"></div>
+        </section>
+
+        <section>
+            <div class="toolbar">
+                <h2>Script Editor</h2>
+                <div class="row">
+                    <button id="saveScriptButton" type="button">Save</button>
+                    <button id="deleteScriptButton" class="danger" type="button">Delete</button>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div>
+                    <label for="scriptId">ID</label>
+                    <input id="scriptId" placeholder="Generated on save">
+                </div>
+                <div>
+                    <label for="timeoutSeconds">Timeout seconds</label>
+                    <input id="timeoutSeconds" type="number" min="1" value="900">
+                </div>
+                <div>
+                    <label for="label">Label</label>
+                    <input id="label">
+                </div>
+                <div>
+                    <label for="command">Command</label>
+                    <div class="input-row">
+                        <input id="command" placeholder="/path/to/executable">
+                        <button id="browseCommandButton" class="secondary" type="button">Browse</button>
+                    </div>
+                </div>
+                <div class="span-2">
+                    <label for="description">Description</label>
+                    <input id="description">
+                </div>
+                <div class="span-2">
+                    <div class="toolbar">
+                        <h3>Server Parameters</h3>
+                        <button id="addParameterButton" class="secondary" type="button">Add</button>
+                    </div>
+                    <div id="parameterRows" class="builder"></div>
+                </div>
+                <div class="span-2">
+                    <label for="workingDirectory">Working directory</label>
+                    <input id="workingDirectory">
+                </div>
+                <div class="span-2">
+                    <div class="toolbar">
+                        <h3>Script Arguments</h3>
+                        <button id="addArgumentButton" class="secondary" type="button">Add</button>
+                    </div>
+                    <div id="argumentRows" class="builder"></div>
+                </div>
+                <div class="span-2">
+                    <label for="resultSchemaJson">Result schema JSON</label>
+                    <textarea id="resultSchemaJson">{}</textarea>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="toolbar">
+                <h2>Result</h2>
+                <button id="clearResultButton" class="secondary" type="button">Clear</button>
+            </div>
+            <pre id="result"></pre>
+        </section>
+    </div>
+</main>
+<div id="fileBrowser" class="modal-backdrop hidden">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Select command</h2>
+            <button id="closeFileBrowserButton" class="secondary" type="button">Close</button>
+        </div>
+        <div class="modal-path">
+            <div class="input-row">
+                <input id="fileBrowserPath">
+                <button id="openFileBrowserPathButton" class="secondary" type="button">Open</button>
+            </div>
+        </div>
+        <div id="fileBrowserEntries" class="file-list"></div>
+    </div>
+</div>
+<script>
+    let authenticated = false;
+    let scripts = [];
+    let selectedScriptId = null;
+    let currentFileBrowserPath = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    async function api(path, options = {}) {
+        const response = await fetch(path, {
+            credentials: "same-origin",
+            headers: {"Content-Type": "application/json", ...(options.headers || {})},
+            ...options
+        });
+        const text = await response.text();
+        const body = text ? JSON.parse(text) : null;
+        if (!response.ok) {
+            throw new Error(body?.detail || body?.title || response.statusText);
+        }
+        return body;
+    }
+
+    function showResult(value) {
+        $("result").textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+    }
+
+    function setAuthenticated(value, session = null) {
+        authenticated = value;
+        $("authPill").textContent = value ? `${session?.username || "Admin"}` : "Locked";
+        $("authPill").className = value ? "pill ok" : "pill bad";
+        $("logoutButton").classList.toggle("hidden", !value);
+    }
+
+    async function loadSession() {
+        const session = await api("/api/agent/ui/session");
+        setAuthenticated(session.authenticated, session);
+        if (session.authenticated) {
+            await loadScripts();
+        }
+    }
+
+    async function login() {
+        const session = await api("/api/agent/ui/login", {
+            method: "POST",
+            body: JSON.stringify({
+                serverUrl: $("serverUrl").value,
+                username: $("username").value,
+                password: $("password").value
+            })
+        });
+        setAuthenticated(true, session);
+        await loadScripts();
+        showResult(session);
+    }
+
+    async function logout() {
+        await api("/api/agent/ui/logout", {method: "POST", body: "{}"});
+        setAuthenticated(false);
+        scripts = [];
+        renderScripts();
+    }
+
+    async function loadStatus() {
+        const status = await api("/api/agent/status");
+        $("serverUrl").placeholder = status.serverUrl || "http://localhost:8080";
+        const fields = [
+            ["Enrolled", status.enrolled],
+            ["Connected", status.serverConnected],
+            ["Authenticated", status.serverAuthenticated],
+            ["Agent ID", status.agentId || ""],
+            ["Machine ID", status.machineId || ""],
+            ["Config", status.configPath || ""]
+        ];
+        $("statusGrid").innerHTML = fields.map(([label, value]) => `
+            <div class="status-item">
+                <span>${label}</span>
+                <strong>${typeof value === "boolean" ? (value ? "yes" : "no") : value}</strong>
+            </div>
+        `).join("");
+    }
+
+    async function enroll() {
+        const body = await api("/api/agent/enroll", {
+            method: "POST",
+            body: JSON.stringify({
+                enrollmentBundle: $("bundle").value,
+                displayName: $("displayName").value
+            })
+        });
+        showResult(body);
+        await loadStatus();
+    }
+
+    async function loadScripts() {
+        if (!authenticated) {
+            return;
+        }
+        scripts = await api("/api/agent/scripts");
+        renderScripts();
+        if (scripts.length > 0 && !selectedScriptId) {
+            selectScript(scripts[0].id);
+        }
+    }
+
+    function renderScripts() {
+        if (scripts.length === 0) {
+            $("scriptList").innerHTML = `<div class="muted">No scripts configured.</div>`;
+            return;
+        }
+        $("scriptList").innerHTML = scripts.map(script => `
+            <button class="script-item ${script.id === selectedScriptId ? "active" : ""}" type="button" data-script-id="${script.id}">
+                <strong>${escapeHtml(script.label || "Unnamed")}</strong>
+                <span class="muted">${escapeHtml(script.command || "")}</span>
+            </button>
+        `).join("");
+        document.querySelectorAll("[data-script-id]").forEach(button => {
+            button.addEventListener("click", () => selectScript(button.dataset.scriptId));
+        });
+    }
+
+    function selectScript(id) {
+        selectedScriptId = id;
+        const script = scripts.find(item => item.id === id);
+        if (!script) {
+            return;
+        }
+        $("scriptId").value = script.id || "";
+        $("label").value = script.label || "";
+        $("description").value = script.description || "";
+        $("command").value = script.command || "";
+        renderArgumentRows(script.argumentMappings || fixedArgumentsToMappings(script.arguments || []));
+        $("workingDirectory").value = script.workingDirectory || "";
+        $("timeoutSeconds").value = script.timeoutSeconds || 900;
+        renderParameterRows(script.parameters || {});
+        $("resultSchemaJson").value = JSON.stringify(script.resultSchema || {}, null, 2);
+        renderScripts();
+    }
+
+    function newScript() {
+        selectedScriptId = null;
+        $("scriptId").value = "";
+        $("label").value = "";
+        $("description").value = "";
+        $("command").value = "";
+        renderArgumentRows([]);
+        $("workingDirectory").value = "";
+        $("timeoutSeconds").value = "900";
+        renderParameterRows({});
+        $("resultSchemaJson").value = "{}";
+        renderScripts();
+    }
+
+    async function saveScript() {
+        const payload = {
+            id: $("scriptId").value || null,
+            label: $("label").value,
+            description: $("description").value,
+            command: $("command").value,
+            arguments: collectStaticArguments(),
+            argumentMappings: collectArgumentMappings(),
+            workingDirectory: $("workingDirectory").value,
+            timeoutSeconds: Number($("timeoutSeconds").value || "900"),
+            parameters: collectParameters(),
+            resultSchema: JSON.parse($("resultSchemaJson").value || "{}"),
+            spamProtection: {enabled: true, cooldownSeconds: 10}
+        };
+        const saved = await api("/api/agent/scripts", {method: "POST", body: JSON.stringify(payload)});
+        selectedScriptId = saved.id;
+        showResult(saved);
+        await loadScripts();
+    }
+
+    async function deleteScript() {
+        if (!selectedScriptId) {
+            return;
+        }
+        await api(`/api/agent/scripts/${selectedScriptId}`, {method: "DELETE"});
+        selectedScriptId = null;
+        newScript();
+        await loadScripts();
+        showResult("Deleted");
+    }
+
+    async function publishManifest() {
+        const result = await api("/api/agent/scripts/publish-manifest", {method: "POST", body: "{}"});
+        showResult(result);
+    }
+
+    async function openFileBrowser(path = "") {
+        if (!authenticated) {
+            showResult("Login required");
+            return;
+        }
+        $("fileBrowser").classList.remove("hidden");
+        await loadFileBrowser(path || currentFileBrowserPath || $("workingDirectory").value || "");
+    }
+
+    async function loadFileBrowser(path = "") {
+        const query = path ? `?path=${encodeURIComponent(path)}` : "";
+        const result = await api(`/api/agent/files${query}`);
+        currentFileBrowserPath = result.path;
+        $("fileBrowserPath").value = result.path;
+        const parent = result.parentPath
+            ? `<button class="file-entry" type="button" data-open-path="${escapeHtml(result.parentPath)}"><span>..</span><strong>Parent</strong><span class="muted"></span></button>`
+            : "";
+        $("fileBrowserEntries").innerHTML = parent + result.entries.map(entry => {
+            const action = entry.directory ? "open" : "select";
+            const icon = entry.directory ? "dir" : "exe";
+            const meta = entry.directory ? "directory" : (entry.executable ? "executable" : "file");
+            return `
+                <button class="file-entry" type="button" data-${action}-path="${escapeHtml(entry.path)}" ${!entry.directory && !entry.executable ? "disabled" : ""}>
+                    <span>${icon}</span>
+                    <strong>${escapeHtml(entry.name)}</strong>
+                    <span class="muted">${meta}</span>
+                </button>
+            `;
+        }).join("");
+        document.querySelectorAll("[data-open-path]").forEach(button => {
+            button.addEventListener("click", () => loadFileBrowser(button.dataset.openPath).catch(error => showResult(error.message)));
+        });
+        document.querySelectorAll("[data-select-path]").forEach(button => {
+            button.addEventListener("click", () => selectCommandPath(button.dataset.selectPath));
+        });
+    }
+
+    function selectCommandPath(path) {
+        $("command").value = path;
+        if (!$("workingDirectory").value) {
+            $("workingDirectory").value = parentPath(path);
+        }
+        $("fileBrowser").classList.add("hidden");
+    }
+
+    function parentPath(path) {
+        const normalized = String(path || "").replaceAll("\\", "/");
+        const separatorIndex = normalized.lastIndexOf("/");
+        if (separatorIndex <= 0) {
+            return separatorIndex === 0 ? "/" : "";
+        }
+        return normalized.substring(0, separatorIndex);
+    }
+
+    function fixedArgumentsToMappings(argumentsList) {
+        return argumentsList.map(value => ({type: "FIXED", value, name: "", parameterName: ""}));
+    }
+
+    function renderParameterRows(parameters) {
+        const entries = Object.entries(parameters || {});
+        $("parameterRows").innerHTML = entries.map(([name, definition]) => parameterRowHtml({
+            name,
+            type: definition?.type || "string",
+            required: Boolean(definition?.required),
+            defaultValue: definition?.default ?? ""
+        })).join("");
+        bindParameterRows();
+        refreshArgumentParameterOptions();
+    }
+
+    function parameterRowHtml(row) {
+        return `
+            <div class="builder-row parameter-row">
+                <input data-parameter-name placeholder="name" value="${escapeHtml(row.name || "")}">
+                <select data-parameter-type>
+                    ${["string", "bool", "int", "string[]", "int[]"].map(type => `
+                        <option value="${type}" ${type === row.type ? "selected" : ""}>${type}</option>
+                    `).join("")}
+                </select>
+                <select data-parameter-required>
+                    <option value="false" ${!row.required ? "selected" : ""}>optional</option>
+                    <option value="true" ${row.required ? "selected" : ""}>required</option>
+                </select>
+                <input data-parameter-default placeholder="default" value="${escapeHtml(row.defaultValue ?? "")}">
+                <button class="secondary icon-button" type="button" data-remove-row>×</button>
+            </div>
+        `;
+    }
+
+    function bindParameterRows() {
+        $("parameterRows").querySelectorAll("[data-remove-row]").forEach(button => {
+            button.addEventListener("click", () => {
+                button.closest(".parameter-row").remove();
+                refreshArgumentParameterOptions();
+            });
+        });
+        $("parameterRows").querySelectorAll("input, select").forEach(field => {
+            field.addEventListener("input", refreshArgumentParameterOptions);
+            field.addEventListener("change", refreshArgumentParameterOptions);
+        });
+    }
+
+    function addParameterRow() {
+        $("parameterRows").insertAdjacentHTML("beforeend", parameterRowHtml({
+            name: "",
+            type: "string",
+            required: false,
+            defaultValue: ""
+        }));
+        bindParameterRows();
+        refreshArgumentParameterOptions();
+    }
+
+    function collectParameters() {
+        const parameters = {};
+        $("parameterRows").querySelectorAll(".parameter-row").forEach(row => {
+            const name = row.querySelector("[data-parameter-name]").value.trim();
+            if (!name) {
+                return;
+            }
+            const definition = {
+                type: row.querySelector("[data-parameter-type]").value,
+                required: row.querySelector("[data-parameter-required]").value === "true"
+            };
+            const defaultValue = row.querySelector("[data-parameter-default]").value;
+            if (defaultValue !== "") {
+                definition.default = parseDefaultValue(definition.type, defaultValue);
+            }
+            parameters[name] = definition;
+        });
+        return parameters;
+    }
+
+    function parseDefaultValue(type, value) {
+        if (type === "bool") {
+            return value === "true";
+        }
+        if (type === "int") {
+            return Number(value);
+        }
+        if (type === "string[]" || type === "int[]") {
+            const values = value.split(",").map(item => item.trim()).filter(Boolean);
+            return type === "int[]" ? values.map(Number) : values;
+        }
+        return value;
+    }
+
+    function renderArgumentRows(argumentMappings) {
+        $("argumentRows").innerHTML = (argumentMappings || []).map(mapping => argumentRowHtml(mapping)).join("");
+        bindArgumentRows();
+        refreshArgumentParameterOptions();
+    }
+
+    function argumentRowHtml(mapping) {
+        const type = mapping?.type || mapping?.source || "FIXED";
+        return `
+            <div class="builder-row argument-row">
+                <select data-argument-type>
+                    <option value="FIXED" ${type === "FIXED" ? "selected" : ""}>fixed</option>
+                    <option value="PARAMETER" ${type === "PARAMETER" ? "selected" : ""}>positional</option>
+                    <option value="NAMED_PARAMETER" ${type === "NAMED_PARAMETER" ? "selected" : ""}>named</option>
+                    <option value="FLAG_PARAMETER" ${type === "FLAG_PARAMETER" ? "selected" : ""}>flag</option>
+                </select>
+                <input data-argument-name placeholder="name, e.g. --target" value="${escapeHtml(mapping?.name || "")}">
+                <input data-argument-value placeholder="fixed value" value="${escapeHtml(mapping?.value || "")}">
+                <select data-argument-parameter data-selected-parameter="${escapeHtml(mapping?.parameterName || "")}"></select>
+                <button class="secondary icon-button" type="button" data-move-argument="up">↑</button>
+                <button class="secondary icon-button" type="button" data-move-argument="down">↓</button>
+                <button class="secondary icon-button" type="button" data-remove-row>×</button>
+            </div>
+        `;
+    }
+
+    function bindArgumentRows() {
+        $("argumentRows").querySelectorAll("[data-remove-row]").forEach(button => {
+            button.addEventListener("click", () => button.closest(".argument-row").remove());
+        });
+        $("argumentRows").querySelectorAll("[data-move-argument]").forEach(button => {
+            button.addEventListener("click", () => moveArgumentRow(button.closest(".argument-row"), button.dataset.moveArgument));
+        });
+        $("argumentRows").querySelectorAll("[data-argument-type]").forEach(select => {
+            select.addEventListener("change", () => updateArgumentRowMode(select.closest(".argument-row")));
+        });
+        $("argumentRows").querySelectorAll(".argument-row").forEach(updateArgumentRowMode);
+    }
+
+    function addArgumentRow() {
+        $("argumentRows").insertAdjacentHTML("beforeend", argumentRowHtml({
+            type: "FIXED",
+            name: "",
+            value: "",
+            parameterName: ""
+        }));
+        bindArgumentRows();
+        refreshArgumentParameterOptions();
+    }
+
+    function updateArgumentRowMode(row) {
+        const type = row.querySelector("[data-argument-type]").value;
+        const needsName = type === "NAMED_PARAMETER" || type === "FLAG_PARAMETER";
+        const needsValue = type === "FIXED";
+        const needsParameter = type !== "FIXED";
+        row.querySelector("[data-argument-name]").disabled = !needsName;
+        row.querySelector("[data-argument-value]").disabled = !needsValue;
+        row.querySelector("[data-argument-parameter]").disabled = !needsParameter;
+    }
+
+    function moveArgumentRow(row, direction) {
+        if (direction === "up" && row.previousElementSibling) {
+            row.parentElement.insertBefore(row, row.previousElementSibling);
+        }
+        if (direction === "down" && row.nextElementSibling) {
+            row.parentElement.insertBefore(row.nextElementSibling, row);
+        }
+    }
+
+    function collectArgumentMappings() {
+        const mappings = [];
+        $("argumentRows").querySelectorAll(".argument-row").forEach(row => {
+            const type = row.querySelector("[data-argument-type]").value;
+            const name = row.querySelector("[data-argument-name]").value.trim();
+            if (type === "FIXED") {
+                const value = row.querySelector("[data-argument-value]").value;
+                if (value !== "") {
+                    mappings.push({type, value});
+                }
+                return;
+            }
+            if (type === "PARAMETER") {
+                const parameterName = row.querySelector("[data-argument-parameter]").value;
+                if (parameterName) {
+                    mappings.push({type, parameterName});
+                }
+                return;
+            }
+            const parameterName = row.querySelector("[data-argument-parameter]").value;
+            if (name && parameterName) {
+                mappings.push({type, name, parameterName});
+            }
+        });
+        return mappings;
+    }
+
+    function collectStaticArguments() {
+        return collectArgumentMappings()
+            .filter(mapping => mapping.type === "FIXED")
+            .map(mapping => mapping.value);
+    }
+
+    function refreshArgumentParameterOptions() {
+        const names = Array.from($("parameterRows").querySelectorAll("[data-parameter-name]"))
+            .map(input => input.value.trim())
+            .filter(Boolean);
+        $("argumentRows").querySelectorAll("[data-argument-parameter]").forEach(select => {
+            const selected = select.value || select.dataset.selectedParameter || "";
+            select.innerHTML = names.map(name => `
+                <option value="${escapeHtml(name)}" ${name === selected ? "selected" : ""}>${escapeHtml(name)}</option>
+            `).join("");
+            select.dataset.selectedParameter = select.value;
+        });
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+    }
+
+    $("loginButton").addEventListener("click", () => login().catch(error => showResult(error.message)));
+    $("logoutButton").addEventListener("click", () => logout().catch(error => showResult(error.message)));
+    $("refreshStatusButton").addEventListener("click", () => loadStatus().catch(error => showResult(error.message)));
+    $("enrollButton").addEventListener("click", () => enroll().catch(error => showResult(error.message)));
+    $("newScriptButton").addEventListener("click", newScript);
+    $("saveScriptButton").addEventListener("click", () => saveScript().catch(error => showResult(error.message)));
+    $("deleteScriptButton").addEventListener("click", () => deleteScript().catch(error => showResult(error.message)));
+    $("publishManifestButton").addEventListener("click", () => publishManifest().catch(error => showResult(error.message)));
+    $("clearResultButton").addEventListener("click", () => showResult(""));
+    $("addParameterButton").addEventListener("click", addParameterRow);
+    $("addArgumentButton").addEventListener("click", addArgumentRow);
+    $("browseCommandButton").addEventListener("click", () => openFileBrowser().catch(error => showResult(error.message)));
+    $("closeFileBrowserButton").addEventListener("click", () => $("fileBrowser").classList.add("hidden"));
+    $("openFileBrowserPathButton").addEventListener("click", () => loadFileBrowser($("fileBrowserPath").value).catch(error => showResult(error.message)));
+
+    renderParameterRows({});
+    renderArgumentRows([]);
+    loadStatus().catch(error => showResult(error.message));
+    loadSession().catch(error => showResult(error.message));
+</script>
+</body>
+</html>

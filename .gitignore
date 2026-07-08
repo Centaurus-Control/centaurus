@@ -1,0 +1,55 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+agents.md
+
+# Gradle
+.gradle/
+**/.gradle/
+build/
+**/build/
+out/
+**/out/
+!**/gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.properties
+!**/gradlew
+!**/gradlew.bat
+
+# Web UI
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Java
+*.class
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+replay_pid*
+
+# Docker / local runtime data
+copyToDeploy.sh
+docker-compose.override.yml
+data/
+tmp/
+*.pid
+agent/agent-data/
+agent-data/
+
+# OS / editor files
+.ai/
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
