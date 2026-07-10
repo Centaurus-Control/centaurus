@@ -2,6 +2,8 @@
 
 This directory is the deployment bundle for building and running Centaurus on a Docker host.
 
+The recommended path is to download `centaurus-deploy-<version>.tar.gz` from the GitHub release section, extract it on the target host, configure the environment files, and run `deploy.sh`. A full repository checkout is not required on the target host.
+
 ## Requirements
 
 - Git
@@ -33,10 +35,10 @@ The script clones the configured branch, builds the server and web UI Docker ima
 
 ## Release Bundle
 
-From the repository root, create a deploy bundle with:
+Maintainers can create this bundle from a tagged commit in the repository root with:
 
 ```bash
 ./package-deploy.sh
 ```
 
-The script only packages a clean working tree when `HEAD` is exactly tagged. The archive is written to `dist/` and contains the `deploy/` directory without local `.env` files or build output.
+The script only packages a clean working tree when `HEAD` is exactly tagged. The archive is written to `dist/` and contains this `deploy/` directory without local `.env` files or build output.
