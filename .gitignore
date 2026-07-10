@@ -40,6 +40,7 @@ replay_pid*
 # Docker / local runtime data
 copyToDeploy.sh
 docker-compose.override.yml
+deploy/build-output/
 data/
 tmp/
 *.pid

@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# ==========================================================
-# Script location
-# ==========================================================
-
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-ENV_FILE="$SCRIPT_DIR/.build.env"
-
-# ==========================================================
-# Helper functions
-# ==========================================================
+ENV_FILE="$SCRIPT_DIR/.env"
 
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
@@ -67,44 +59,49 @@ clear_directory_contents() {
     -exec rm -rf -- {} +
 }
 
-find_server_jar() {
-  local artifact_dir="$1"
-  local jars=()
+env_file_value() {
+  local file_path="$1"
+  local key="$2"
+  local line
+  local value
 
-  [[ -d "$artifact_dir" ]] || fail "Gradle artifact directory not found: $artifact_dir"
+  line="$(grep -E "^[[:space:]]*${key}=" "$file_path" | tail -n 1 || true)"
+  [[ -n "$line" ]] || return 1
 
-  mapfile -t jars < <(
-    find "$artifact_dir" \
-      -maxdepth 1 \
-      -type f \
-      -name "*.jar" \
-      ! -name "*-plain.jar" \
-      ! -name "*-sources.jar" \
-      ! -name "*-javadoc.jar" \
-      | sort
-  )
+  value="${line#*=}"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
 
-  if [[ "${#jars[@]}" -eq 0 ]]; then
-    mapfile -t jars < <(
-      find "$artifact_dir" \
-        -maxdepth 1 \
-        -type f \
-        -name "*.jar" \
-        ! -name "*-sources.jar" \
-        ! -name "*-javadoc.jar" \
-        | sort
-    )
+  if [[ "$value" == \"*\" && "$value" == *\" ]]; then
+    value="${value:1:${#value}-2}"
+  elif [[ "$value" == \'*\' && "$value" == *\' ]]; then
+    value="${value:1:${#value}-2}"
   fi
 
-  [[ "${#jars[@]}" -gt 0 ]] || fail "No JAR file found in: $artifact_dir"
+  printf '%s' "$value"
+}
 
-  if [[ "${#jars[@]}" -gt 1 ]]; then
-    echo "Found multiple possible JAR files:"
-    printf ' - %s\n' "${jars[@]}"
-    fail "More than one possible JAR file found. Please make the build output unambiguous."
-  fi
+require_env_file_key() {
+  local file_path="$1"
+  local key="$2"
+  local value
 
-  echo "${jars[0]}"
+  value="$(env_file_value "$file_path" "$key" || true)"
+  [[ -n "$value" ]] || fail "Required runtime env value is missing or empty: $key in $file_path"
+}
+
+reject_placeholder_env_value() {
+  local file_path="$1"
+  local key="$2"
+  local value
+
+  value="$(env_file_value "$file_path" "$key" || true)"
+
+  case "$value" in
+    ""|change-me|change-me-*|*-change-me|*change-me*)
+      fail "Runtime env value still contains a placeholder: $key in $file_path"
+      ;;
+  esac
 }
 
 build_docker_image() {
@@ -114,6 +111,7 @@ build_docker_image() {
   local image_tag="$4"
   local commit_short="$5"
   local extra_build_args_text="${6:-}"
+  local server_gradle_tasks_arg="${7:-}"
 
   local docker_tag_args=(
     "-t" "$image_name:$image_tag"
@@ -144,6 +142,12 @@ build_docker_image() {
   if [[ -n "$extra_build_args_text" ]]; then
     read -r -a extra_build_args <<< "$extra_build_args_text"
     docker_build_args+=("${extra_build_args[@]}")
+  fi
+
+  if [[ -n "$server_gradle_tasks_arg" ]]; then
+    docker_build_args+=(
+      "--build-arg" "SERVER_GRADLE_TASKS=$server_gradle_tasks_arg"
+    )
   fi
 
   log "Docker build context: $context_dir"
@@ -206,21 +210,60 @@ wait_for_compose_service_health() {
   done
 }
 
-# ==========================================================
-# Load environment file
-# ==========================================================
+validate_runtime_env() {
+  local compose_env_file_path="$1"
+  local expected_server_image="$2"
+  local expected_webui_image="$3"
 
-if [[ -f "$ENV_FILE" ]]; then
-  log "Loading environment file: $ENV_FILE"
-  # shellcheck source=/dev/null
-  source "$ENV_FILE"
-else
-  log "No environment file found at: $ENV_FILE"
-fi
+  [[ -f "$compose_env_file_path" ]] || fail "Compose env file not found: $compose_env_file_path. Copy .env.example to .env and configure it first."
 
-# ==========================================================
-# Configuration
-# ==========================================================
+  local required_keys=(
+    CENTAURUS_SERVER_IMAGE
+    CENTAURUS_WEBUI_IMAGE
+    CENTAURUS_SERVER_HTTP_PORT
+    CENTAURUS_WEBUI_HTTP_PORT
+    POSTGRES_DB
+    POSTGRES_USER
+    POSTGRES_PASSWORD
+    CENTAURUS_AUTH_JWT_SECRET
+    CENTAURUS_BOOTSTRAP_ADMIN_USERNAME
+    CENTAURUS_BOOTSTRAP_ADMIN_PASSWORD
+    CENTAURUS_ENROLLMENT_SERVER_URL
+    CENTAURUS_ENROLLMENT_WS_URL
+  )
+
+  local placeholder_keys=(
+    POSTGRES_PASSWORD
+    CENTAURUS_AUTH_JWT_SECRET
+    CENTAURUS_BOOTSTRAP_ADMIN_PASSWORD
+  )
+
+  for key in "${required_keys[@]}"; do
+    require_env_file_key "$compose_env_file_path" "$key"
+  done
+
+  for key in "${placeholder_keys[@]}"; do
+    reject_placeholder_env_value "$compose_env_file_path" "$key"
+  done
+
+  if is_true "$SERVER_ENABLED"; then
+    local configured_server_image
+    configured_server_image="$(env_file_value "$compose_env_file_path" CENTAURUS_SERVER_IMAGE || true)"
+    [[ "$configured_server_image" == "$expected_server_image" ]] || fail "CENTAURUS_SERVER_IMAGE must match the image built by deploy.sh. Expected '$expected_server_image', got '$configured_server_image'."
+  fi
+
+  if is_true "$WEBUI_ENABLED"; then
+    local configured_webui_image
+    configured_webui_image="$(env_file_value "$compose_env_file_path" CENTAURUS_WEBUI_IMAGE || true)"
+    [[ "$configured_webui_image" == "$expected_webui_image" ]] || fail "CENTAURUS_WEBUI_IMAGE must match the image built by deploy.sh. Expected '$expected_webui_image', got '$configured_webui_image'."
+  fi
+}
+
+[[ -f "$ENV_FILE" ]] || fail "Deployment env file not found: $ENV_FILE. Copy .env.example to .env and configure it first."
+
+log "Loading deployment env file: $ENV_FILE"
+# shellcheck source=/dev/null
+source "$ENV_FILE"
 
 REPO_URL="${REPO_URL:-}"
 BRANCH="${BRANCH:-main}"
@@ -234,70 +277,52 @@ PRUNE_DANGLING_IMAGES="${PRUNE_DANGLING_IMAGES:-false}"
 
 SERVER_ENABLED="${SERVER_ENABLED:-true}"
 SERVER_PROJECT_DIR="${SERVER_PROJECT_DIR:-server}"
-SERVER_JAVA_HOME="${SERVER_JAVA_HOME:-}"
-SERVER_GRADLE_TASKS="${SERVER_GRADLE_TASKS:-clean build}"
-SERVER_DOCKERFILE_PATH="${SERVER_DOCKERFILE_PATH:-Dockerfile}"
-SERVER_DOCKER_JAR_NAME="${SERVER_DOCKER_JAR_NAME:-app.jar}"
+SERVER_DOCKERFILE_PATH="${SERVER_DOCKERFILE_PATH:-deploy/Dockerfile}"
 SERVER_DOCKER_BUILD_ARGS="${SERVER_DOCKER_BUILD_ARGS:-}"
+SERVER_GRADLE_TASKS="${SERVER_GRADLE_TASKS:-clean build}"
 SERVER_IMAGE_NAME="${SERVER_IMAGE_NAME:-centaurus-server}"
 SERVER_IMAGE_TAG="${SERVER_IMAGE_TAG:-latest}"
 
 WEBUI_ENABLED="${WEBUI_ENABLED:-true}"
-WEBUI_PROJECT_DIR="${WEBUI_PROJECT_DIR:-ui}"
-WEBUI_DOCKERFILE_PATH="${WEBUI_DOCKERFILE_PATH:-Dockerfile}"
+WEBUI_PROJECT_DIR="${WEBUI_PROJECT_DIR:-webui}"
+WEBUI_DOCKERFILE_PATH="${WEBUI_DOCKERFILE_PATH:-deploy/Dockerfile}"
 WEBUI_DOCKER_BUILD_ARGS="${WEBUI_DOCKER_BUILD_ARGS:-}"
-WEBUI_IMAGE_NAME="${WEBUI_IMAGE_NAME:-centaurus-ui}"
+WEBUI_IMAGE_NAME="${WEBUI_IMAGE_NAME:-centaurus-webui}"
 WEBUI_IMAGE_TAG="${WEBUI_IMAGE_TAG:-latest}"
 
-COMPOSE_ENABLED="${COMPOSE_ENABLED:-false}"
-COMPOSE_PROJECT_DIR="${COMPOSE_PROJECT_DIR:-}"
+COMPOSE_ENABLED="${COMPOSE_ENABLED:-true}"
+COMPOSE_PROJECT_DIR="$(to_absolute_path "${COMPOSE_PROJECT_DIR:-./compose}")"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.yml}"
 COMPOSE_ENV_FILE="${COMPOSE_ENV_FILE:-.env}"
-COMPOSE_DEPENDENCY_SERVICES="${COMPOSE_DEPENDENCY_SERVICES:-}"
-COMPOSE_RECREATE_SERVICES="${COMPOSE_RECREATE_SERVICES:-}"
+COMPOSE_DEPENDENCY_SERVICES="${COMPOSE_DEPENDENCY_SERVICES:-postgres}"
+COMPOSE_RECREATE_SERVICES="${COMPOSE_RECREATE_SERVICES:-server webui}"
 COMPOSE_WAIT_TIMEOUT_SECONDS="${COMPOSE_WAIT_TIMEOUT_SECONDS:-120}"
-
-# ==========================================================
-# Pre-flight checks
-# ==========================================================
 
 require_command git
 require_command docker
 require_command find
 require_command date
 require_command mktemp
-require_command sed
 require_command sleep
 
-[[ -n "$REPO_URL" ]] || fail "REPO_URL is not configured. Please set it in $ENV_FILE."
+docker compose version >/dev/null 2>&1 || fail "Docker Compose plugin is not available. Expected: docker compose"
 
-if is_true "$SERVER_ENABLED"; then
-  if [[ -n "$SERVER_JAVA_HOME" ]]; then
-    [[ -d "$SERVER_JAVA_HOME" ]] || fail "SERVER_JAVA_HOME does not exist: $SERVER_JAVA_HOME"
-    [[ -x "$SERVER_JAVA_HOME/bin/java" ]] || fail "Java executable not found: $SERVER_JAVA_HOME/bin/java"
-
-    export JAVA_HOME="$SERVER_JAVA_HOME"
-    export PATH="$SERVER_JAVA_HOME/bin:$PATH"
-
-    log "Using SERVER_JAVA_HOME: $SERVER_JAVA_HOME"
-  else
-    log "SERVER_JAVA_HOME is not set. Using Java from PATH."
-  fi
-
-  require_command java
-
-  log "Java version:"
-  java -version
-fi
+[[ -n "$REPO_URL" ]] || fail "REPO_URL is not configured in $ENV_FILE."
 
 if is_true "$COMPOSE_ENABLED"; then
-  [[ -n "$COMPOSE_PROJECT_DIR" ]] || fail "COMPOSE_PROJECT_DIR is not configured."
   [[ -d "$COMPOSE_PROJECT_DIR" ]] || fail "COMPOSE_PROJECT_DIR does not exist: $COMPOSE_PROJECT_DIR"
-fi
 
-# ==========================================================
-# Temporary workspace
-# ==========================================================
+  COMPOSE_ENV_FILE_PATH="$COMPOSE_ENV_FILE"
+
+  if [[ "$COMPOSE_ENV_FILE_PATH" != /* ]]; then
+    COMPOSE_ENV_FILE_PATH="$COMPOSE_PROJECT_DIR/$COMPOSE_ENV_FILE_PATH"
+  fi
+
+  validate_runtime_env \
+    "$COMPOSE_ENV_FILE_PATH" \
+    "$SERVER_IMAGE_NAME:$SERVER_IMAGE_TAG" \
+    "$WEBUI_IMAGE_NAME:$WEBUI_IMAGE_TAG"
+fi
 
 WORK_DIR="$(mktemp -d)"
 REPO_DIR="$WORK_DIR/repo"
@@ -308,15 +333,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-# ==========================================================
-# Prepare output directory
-# ==========================================================
-
 clear_directory_contents "$OUTPUT_DIR"
-
-# ==========================================================
-# Git checkout
-# ==========================================================
 
 log "Checking out branch '$BRANCH' from '$REPO_URL'..."
 
@@ -336,68 +353,22 @@ BUILD_TIMESTAMP="$(date -Iseconds)"
 
 log "Checked out commit: $COMMIT_HASH"
 
-# ==========================================================
-# Build server image
-# ==========================================================
-
 if is_true "$SERVER_ENABLED"; then
   SERVER_BUILD_DIR="$REPO_DIR/$SERVER_PROJECT_DIR"
-  SERVER_CONTEXT_DIR="$OUTPUT_DIR/server-context"
   SERVER_BUILD_INFO="$OUTPUT_DIR/server-build-info.txt"
   SERVER_DOCKERFILE_SOURCE="$(resolve_path_relative_to "$SERVER_BUILD_DIR" "$SERVER_DOCKERFILE_PATH")"
 
   [[ -d "$SERVER_BUILD_DIR" ]] || fail "Server project directory does not exist: $SERVER_PROJECT_DIR"
   [[ -f "$SERVER_DOCKERFILE_SOURCE" ]] || fail "Server Dockerfile not found: $SERVER_DOCKERFILE_SOURCE"
 
-  if [[ -f "$SERVER_BUILD_DIR/gradlew" ]]; then
-    chmod +x "$SERVER_BUILD_DIR/gradlew"
-
-    SERVER_WRAPPER_JAR="$SERVER_BUILD_DIR/gradle/wrapper/gradle-wrapper.jar"
-    [[ -f "$SERVER_WRAPPER_JAR" ]] || fail "Gradle wrapper JAR is missing: $SERVER_WRAPPER_JAR"
-
-    SERVER_GRADLE_CMD=("$SERVER_BUILD_DIR/gradlew" "--no-daemon")
-  elif [[ -f "$REPO_DIR/gradlew" ]]; then
-    chmod +x "$REPO_DIR/gradlew"
-
-    SERVER_WRAPPER_JAR="$REPO_DIR/gradle/wrapper/gradle-wrapper.jar"
-    [[ -f "$SERVER_WRAPPER_JAR" ]] || fail "Gradle wrapper JAR is missing: $SERVER_WRAPPER_JAR"
-
-    SERVER_GRADLE_CMD=("$REPO_DIR/gradlew" "--no-daemon")
-  else
-    require_command gradle
-    SERVER_GRADLE_CMD=("gradle" "--no-daemon")
-  fi
-
-  cd "$SERVER_BUILD_DIR"
-
-  log "Starting server Gradle build in: $SERVER_BUILD_DIR"
-  log "Server Gradle tasks: $SERVER_GRADLE_TASKS"
-
-  read -r -a SERVER_GRADLE_ARGS <<< "$SERVER_GRADLE_TASKS"
-
-  "${SERVER_GRADLE_CMD[@]}" "${SERVER_GRADLE_ARGS[@]}"
-
-  SERVER_SOURCE_JAR="$(find_server_jar "$SERVER_BUILD_DIR/build/libs")"
-
-  clear_directory_contents "$SERVER_CONTEXT_DIR"
-
-  log "Preparing server Docker context..."
-  cp "$SERVER_SOURCE_JAR" "$SERVER_CONTEXT_DIR/$SERVER_DOCKER_JAR_NAME"
-  cp "$SERVER_DOCKERFILE_SOURCE" "$SERVER_CONTEXT_DIR/Dockerfile"
-
-  log "Server source JAR: $SERVER_SOURCE_JAR"
-  log "Server Dockerfile source: $SERVER_DOCKERFILE_SOURCE"
-  log "Server Docker context: $SERVER_CONTEXT_DIR"
-  log "Server Dockerfile preview:"
-  sed -n '1,120p' "$SERVER_CONTEXT_DIR/Dockerfile"
-
   build_docker_image \
-    "$SERVER_CONTEXT_DIR" \
-    "$SERVER_CONTEXT_DIR/Dockerfile" \
+    "$SERVER_BUILD_DIR" \
+    "$SERVER_DOCKERFILE_SOURCE" \
     "$SERVER_IMAGE_NAME" \
     "$SERVER_IMAGE_TAG" \
     "$COMMIT_SHORT" \
-    "$SERVER_DOCKER_BUILD_ARGS"
+    "$SERVER_DOCKER_BUILD_ARGS" \
+    "$SERVER_GRADLE_TASKS"
 
   cat > "$SERVER_BUILD_INFO" <<EOF
 repo=$REMOTE_URL
@@ -405,11 +376,8 @@ branch=$BRANCH
 commit=$COMMIT_HASH
 commit_short=$COMMIT_SHORT
 server_project_dir=$SERVER_PROJECT_DIR
-server_gradle_tasks=$SERVER_GRADLE_TASKS
-server_source_jar=$SERVER_SOURCE_JAR
 server_dockerfile_source=$SERVER_DOCKERFILE_SOURCE
-server_docker_context=$SERVER_CONTEXT_DIR
-server_docker_jar=$SERVER_CONTEXT_DIR/$SERVER_DOCKER_JAR_NAME
+server_gradle_tasks=$SERVER_GRADLE_TASKS
 server_image=$SERVER_IMAGE_NAME:$SERVER_IMAGE_TAG
 server_commit_image=$SERVER_IMAGE_NAME:$COMMIT_SHORT
 built_at=$BUILD_TIMESTAMP
@@ -417,10 +385,6 @@ EOF
 
   log "Server image build completed."
 fi
-
-# ==========================================================
-# Build web UI image
-# ==========================================================
 
 if is_true "$WEBUI_ENABLED"; then
   WEBUI_BUILD_DIR="$REPO_DIR/$WEBUI_PROJECT_DIR"
@@ -430,11 +394,6 @@ if is_true "$WEBUI_ENABLED"; then
   [[ -d "$WEBUI_BUILD_DIR" ]] || fail "Web UI project directory does not exist: $WEBUI_PROJECT_DIR"
   [[ -f "$WEBUI_BUILD_DIR/package.json" ]] || fail "package.json not found in: $WEBUI_BUILD_DIR"
   [[ -f "$WEBUI_DOCKERFILE_SOURCE" ]] || fail "Web UI Dockerfile not found: $WEBUI_DOCKERFILE_SOURCE"
-
-  log "Web UI Docker build directory: $WEBUI_BUILD_DIR"
-  log "Web UI Dockerfile source: $WEBUI_DOCKERFILE_SOURCE"
-  log "Web UI Dockerfile preview:"
-  sed -n '1,120p' "$WEBUI_DOCKERFILE_SOURCE"
 
   build_docker_image \
     "$WEBUI_BUILD_DIR" \
@@ -460,10 +419,6 @@ EOF
   log "Web UI image build completed."
 fi
 
-# ==========================================================
-# Docker compose deployment
-# ==========================================================
-
 if is_true "$COMPOSE_ENABLED"; then
   COMPOSE_FILE_PATH="$COMPOSE_FILE"
 
@@ -477,28 +432,12 @@ if is_true "$COMPOSE_ENABLED"; then
     docker compose
     --project-directory "$COMPOSE_PROJECT_DIR"
     -f "$COMPOSE_FILE_PATH"
+    --env-file "$COMPOSE_ENV_FILE_PATH"
   )
-
-  if [[ -n "$COMPOSE_ENV_FILE" ]]; then
-    COMPOSE_ENV_FILE_PATH="$COMPOSE_ENV_FILE"
-
-    if [[ "$COMPOSE_ENV_FILE_PATH" != /* ]]; then
-      COMPOSE_ENV_FILE_PATH="$COMPOSE_PROJECT_DIR/$COMPOSE_ENV_FILE_PATH"
-    fi
-
-    [[ -f "$COMPOSE_ENV_FILE_PATH" ]] || fail "Compose env file not found: $COMPOSE_ENV_FILE_PATH"
-
-    COMPOSE_CMD+=(
-      --env-file "$COMPOSE_ENV_FILE_PATH"
-    )
-  fi
 
   log "Docker compose project directory: $COMPOSE_PROJECT_DIR"
   log "Docker compose file: $COMPOSE_FILE_PATH"
-
-  if [[ -n "${COMPOSE_ENV_FILE_PATH:-}" ]]; then
-    log "Docker compose env file: $COMPOSE_ENV_FILE_PATH"
-  fi
+  log "Docker compose env file: $COMPOSE_ENV_FILE_PATH"
 
   if [[ -n "$COMPOSE_DEPENDENCY_SERVICES" ]]; then
     read -r -a DEPENDENCY_SERVICES <<< "$COMPOSE_DEPENDENCY_SERVICES"
@@ -536,18 +475,10 @@ if is_true "$COMPOSE_ENABLED"; then
   log "Docker compose deployment completed."
 fi
 
-# ==========================================================
-# Cleanup dangling images
-# ==========================================================
-
 if is_true "$PRUNE_DANGLING_IMAGES"; then
   log "Pruning dangling Docker images..."
   docker image prune -f
 fi
-
-# ==========================================================
-# Overall build info
-# ==========================================================
 
 BUILD_INFO="$OUTPUT_DIR/build-info.txt"
 

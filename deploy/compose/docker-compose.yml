@@ -4,10 +4,13 @@ services:
     pull_policy: "${CENTAURUS_WEBUI_PULL_POLICY:-missing}"
     container_name: centaurus-webui
     restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
     ports:
       - "${CENTAURUS_WEBUI_HTTP_PORT:-8081}:80"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost/ >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -43,7 +46,7 @@ services:
       CENTAURUS_ENROLLMENT_WS_URL: "${CENTAURUS_ENROLLMENT_WS_URL}"
       JAVA_OPTS: "${JAVA_OPTS:-}"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health >/dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 12

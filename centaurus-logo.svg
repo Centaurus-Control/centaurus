@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="880"
+   height="880"
+   viewBox="0 0 880 880"
+   fill="none"
+   version="1.1"
+   id="svg35"
+   sodipodi:docname="centaurus-logo.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   inkscape:export-filename="../dev/shadowsoft/centaurus/Centautus-Logo.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <sodipodi:namedview
+     id="namedview35"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.72265625"
+     inkscape:cx="177.81622"
+     inkscape:cy="426.20541"
+     inkscape:window-width="1920"
+     inkscape:window-height="945"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg35" />
+  <title
+     id="title1">Centaurus Remote Management Logo - Inkscape Safe</title>
+  <defs
+     id="defs11">
+    <linearGradient
+       id="bgGradient"
+       x1="128"
+       y1="96"
+       x2="896"
+       y2="928"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#071B3A"
+         id="stop1" />
+      <stop
+         offset="0.55"
+         stop-color="#061225"
+         id="stop2" />
+      <stop
+         offset="1"
+         stop-color="#020814"
+         id="stop3" />
+    </linearGradient>
+    <linearGradient
+       id="cGradient"
+       x1="220"
+       y1="190"
+       x2="780"
+       y2="830"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#5ADEFF"
+         id="stop4" />
+      <stop
+         offset="0.34"
+         stop-color="#168BFF"
+         id="stop5" />
+      <stop
+         offset="0.72"
+         stop-color="#0A49D6"
+         id="stop6" />
+      <stop
+         offset="1"
+         stop-color="#032A82"
+         id="stop7" />
+    </linearGradient>
+    <linearGradient
+       id="greenAccent"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#8DFFC4"
+         id="stop8" />
+      <stop
+         offset="1"
+         stop-color="#00D47A"
+         id="stop9" />
+    </linearGradient>
+    <linearGradient
+       id="screenGradient"
+       x1="350"
+       y1="370"
+       x2="640"
+       y2="605"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#0D2B57"
+         id="stop10" />
+      <stop
+         offset="1"
+         stop-color="#06172D"
+         id="stop11" />
+    </linearGradient>
+    <clipPath
+       id="roundedSquare">
+      <rect
+         x="72"
+         y="72"
+         width="880"
+         height="880"
+         rx="196"
+         id="rect11" />
+    </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#greenAccent"
+       id="linearGradient35"
+       gradientUnits="userSpaceOnUse"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#greenAccent"
+       id="linearGradient36"
+       gradientUnits="userSpaceOnUse"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#greenAccent"
+       id="linearGradient37"
+       gradientUnits="userSpaceOnUse"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#greenAccent"
+       id="linearGradient38"
+       gradientUnits="userSpaceOnUse"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#greenAccent"
+       id="linearGradient39"
+       gradientUnits="userSpaceOnUse"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#greenAccent"
+       id="linearGradient40"
+       gradientUnits="userSpaceOnUse"
+       x1="600"
+       y1="330"
+       x2="830"
+       y2="690" />
+  </defs>
+  <!-- Transparent outside, rounded rectangle kept -->
+  <g
+     clip-path="url(#roundedSquare)"
+     id="g13"
+     transform="translate(-72,-72)">
+    <rect
+       x="72"
+       y="72"
+       width="880"
+       height="880"
+       rx="196"
+       fill="url(#bgGradient)"
+       id="rect12"
+       style="fill:url(#bgGradient)" />
+    <circle
+       cx="270"
+       cy="218"
+       r="245"
+       fill="#0b8fff"
+       opacity="0.13"
+       id="circle12" />
+    <circle
+       cx="770"
+       cy="794"
+       r="260"
+       fill="#00d47a"
+       opacity="0.07"
+       id="circle13" />
+    <rect
+       x="75"
+       y="75"
+       width="874"
+       height="874"
+       rx="193"
+       stroke="#1a77ff"
+       stroke-opacity="0.55"
+       stroke-width="6"
+       id="rect13" />
+  </g>
+  <!-- Main C shadow substitute, no SVG filters -->
+  <!-- Main C -->
+  <!-- Inner highlight on C -->
+  <!-- Remote/network lines -->
+  <!-- Monitor shadow substitute -->
+  <!-- Center terminal monitor -->
+  <!-- WOL / command motion bars -->
+  <!-- Small central node -->
+  <g
+     id="g41"
+     transform="translate(-87.221622,-30.486486)">
+    <g
+       id="g40">
+      <path
+         d="M 736,258 C 683,206 611,178 536,178 378,178 250,306 250,464 c 0,158 128,286 286,286 76,0 146,-29 199,-79"
+         stroke="#021b58"
+         stroke-width="126"
+         stroke-linecap="round"
+         opacity="0.65"
+         id="path13" />
+      <path
+         d="M 736,258 C 683,206 611,178 536,178 378,178 250,306 250,464 c 0,158 128,286 286,286 76,0 146,-29 199,-79"
+         stroke="url(#cGradient)"
+         stroke-width="112"
+         stroke-linecap="round"
+         id="path14"
+         style="stroke:url(#cGradient)" />
+      <path
+         d="M 718,279 C 670,237 607,214 538,214 399,214 287,326 287,465 c 0,139 112,251 251,251 70,0 134,-28 180,-74"
+         stroke="#8AE8FF"
+         stroke-opacity="0.38"
+         stroke-width="22"
+         stroke-linecap="round"
+         id="path15"
+         style="stroke:#8ae800;stroke-opacity:0.38" />
+    </g>
+    <g
+       id="g22"
+       transform="translate(33.210811,-49.816216)">
+      <path
+         d="m 650,420 h 54 c 17,0 31,-14 31,-31 v -31"
+         stroke="#003f6b"
+         stroke-width="25"
+         stroke-linecap="round"
+         opacity="0.65"
+         id="path16" />
+      <path
+         d="m 650,420 h 54 c 17,0 31,-14 31,-31 v -31"
+         stroke="url(#greenAccent)"
+         stroke-width="16"
+         stroke-linecap="round"
+         id="path17"
+         style="stroke:url(#linearGradient35)" />
+      <circle
+         cx="735"
+         cy="338"
+         r="33"
+         fill="#003f6b"
+         opacity="0.65"
+         id="circle17" />
+      <circle
+         cx="735"
+         cy="338"
+         r="26"
+         fill="#071b3a"
+         stroke="url(#greenAccent)"
+         stroke-width="14"
+         id="circle18"
+         style="stroke:url(#linearGradient36)" />
+      <path
+         d="M 650,512 H 790"
+         stroke="#003f6b"
+         stroke-width="25"
+         stroke-linecap="round"
+         opacity="0.65"
+         id="path18" />
+      <path
+         d="M 650,512 H 790"
+         stroke="url(#greenAccent)"
+         stroke-width="16"
+         stroke-linecap="round"
+         id="path19"
+         style="stroke:url(#linearGradient37)" />
+      <circle
+         cx="826"
+         cy="512"
+         r="33"
+         fill="#003f6b"
+         opacity="0.65"
+         id="circle19" />
+      <circle
+         cx="826"
+         cy="512"
+         r="26"
+         fill="#071b3a"
+         stroke="url(#greenAccent)"
+         stroke-width="14"
+         id="circle20"
+         style="stroke:url(#linearGradient38)" />
+      <path
+         d="m 650,604 h 54 c 17,0 31,14 31,31 v 31"
+         stroke="#003f6b"
+         stroke-width="25"
+         stroke-linecap="round"
+         opacity="0.65"
+         id="path20" />
+      <path
+         d="m 650,604 h 54 c 17,0 31,14 31,31 v 31"
+         stroke="url(#greenAccent)"
+         stroke-width="16"
+         stroke-linecap="round"
+         id="path21"
+         style="stroke:url(#linearGradient39)" />
+      <circle
+         cx="735"
+         cy="686"
+         r="33"
+         fill="#003f6b"
+         opacity="0.65"
+         id="circle21" />
+      <circle
+         cx="735"
+         cy="686"
+         r="26"
+         fill="#071b3a"
+         stroke="url(#greenAccent)"
+         stroke-width="14"
+         id="circle22"
+         style="stroke:url(#linearGradient40)" />
+    </g>
+    <rect
+       x="361.43243"
+       y="329.95135"
+       width="346"
+       height="240"
+       rx="40"
+       fill="#000814"
+       opacity="0.35"
+       id="rect22" />
+    <g
+       id="g28"
+       transform="translate(47.048649,-30.443243)">
+      <rect
+         x="323"
+         y="365"
+         width="326"
+         height="232"
+         rx="36"
+         fill="url(#screenGradient)"
+         stroke="#bfefff"
+         stroke-width="15"
+         id="rect23"
+         style="fill:url(#screenGradient)" />
+      <!-- Stand -->
+      <rect
+         x="432"
+         y="597"
+         width="108"
+         height="36"
+         rx="11"
+         fill="#bfefff"
+         id="rect24" />
+      <rect
+         x="398"
+         y="633"
+         width="176"
+         height="21"
+         rx="10.5"
+         fill="#bfefff"
+         id="rect25" />
+      <!-- Terminal prompt -->
+      <path
+         d="m 414.60918,500.03079 27.80301,24.18002 -27.80301,24.18002"
+         stroke="#57d4ff"
+         stroke-width="13.2184"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         id="path25" />
+      <path
+         d="m 464.95135,550.68649 h 59"
+         stroke="#57d4ff"
+         stroke-width="22"
+         stroke-linecap="round"
+         id="path26" />
+      <!-- Status lines -->
+      <path
+         d="M 420,415 H 528"
+         stroke="#7cffb2"
+         stroke-width="17"
+         stroke-linecap="round"
+         id="path27" />
+      <path
+         d="m 420,462 h 76"
+         stroke="#57d4ff"
+         stroke-width="17"
+         stroke-linecap="round"
+         opacity="0.92"
+         id="path28" />
+    </g>
+    <g
+       id="g34"
+       style="display:none">
+      <path
+         d="M 246,522 H 196"
+         stroke="#003f6b"
+         stroke-width="25"
+         stroke-linecap="round"
+         opacity="0.55"
+         id="path29" />
+      <path
+         d="M 246,522 H 196"
+         stroke="#7cffb2"
+         stroke-width="16"
+         stroke-linecap="round"
+         id="path30" />
+      <path
+         d="M 246,468 H 166"
+         stroke="#003f6b"
+         stroke-width="25"
+         stroke-linecap="round"
+         opacity="0.55"
+         id="path31" />
+      <path
+         d="M 246,468 H 166"
+         stroke="#168bff"
+         stroke-width="16"
+         stroke-linecap="round"
+         id="path32" />
+      <path
+         d="M 246,414 H 196"
+         stroke="#003f6b"
+         stroke-width="25"
+         stroke-linecap="round"
+         opacity="0.55"
+         id="path33" />
+      <path
+         d="M 246,414 H 196"
+         stroke="#168bff"
+         stroke-width="16"
+         stroke-linecap="round"
+         id="path34" />
+    </g>
+    <circle
+       cx="650"
+       cy="512"
+       r="12"
+       fill="#003f6b"
+       opacity="0.65"
+       id="circle34" />
+    <circle
+       cx="703.73016"
+       cy="461.85522"
+       r="8"
+       fill="#8dffc4"
+       id="circle35" />
+  </g>
+  <metadata
+     id="metadata41">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>Centaurus Remote Management Logo - Inkscape Safe</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>

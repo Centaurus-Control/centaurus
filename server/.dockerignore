@@ -1,0 +1,10 @@
+.gradle/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+hs_err_pid*
+replay_pid*
