@@ -135,13 +135,20 @@ export function App(): ReactElement {
               isSubmitting={controller.isSubmitting}
               t={controller.t}
               temporaryPasswordNotice={controller.temporaryPasswordNotice}
+              trustedCertificateForm={controller.trustedCertificateForm}
+              trustedCertificates={controller.trustedCertificates}
               users={controller.users}
+              onCancelTrustedCertificateEdit={controller.handleCancelTrustedCertificateEdit}
               onCreateUser={controller.handleCreateUser}
               onCreateUserRoleChange={controller.handleCreateUserRoleChange}
               onCreateUserUsernameChange={controller.handleCreateUserUsernameChange}
               onDeleteUser={controller.handleDeleteManagedUser}
+              onDeleteTrustedCertificate={controller.handleDeleteTrustedCertificate}
+              onEditTrustedCertificate={controller.handleEditTrustedCertificate}
               onResetPassword={controller.handleResetManagedUserPassword}
               onRoleChange={controller.handleManagedUserRoleChange}
+              onTrustedCertificateFieldChange={controller.handleTrustedCertificateFieldChange}
+              onTrustedCertificateSubmit={controller.handleTrustedCertificateSubmit}
             />
           ) : null}
 

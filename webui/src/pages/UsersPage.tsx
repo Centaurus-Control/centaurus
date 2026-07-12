@@ -1,6 +1,10 @@
 import { type ChangeEvent, type FormEvent, type ReactElement } from "react";
-import { type UserResponse, type UserRole } from "../api/client";
+import { type TrustedCertificateResponse, type UserResponse, type UserRole } from "../api/client";
 import { AdminUsersPanel, type CreateUserFormState } from "../components/AdminUsersPanel";
+import {
+  TrustedCertificatesPanel,
+  type TrustedCertificateFormState
+} from "../components/TrustedCertificatesPanel";
 import { type MessageKey } from "../i18n/messages";
 
 export interface TemporaryPasswordNotice {
@@ -13,13 +17,20 @@ export interface UsersPageProps {
   isSubmitting: boolean;
   t: (key: MessageKey) => string;
   temporaryPasswordNotice: TemporaryPasswordNotice | null;
+  trustedCertificateForm: TrustedCertificateFormState;
+  trustedCertificates: TrustedCertificateResponse[];
   users: UserResponse[];
+  onCancelTrustedCertificateEdit: () => void;
   onCreateUser: (event: FormEvent<HTMLFormElement>) => Promise<void>;
   onCreateUserRoleChange: (event: ChangeEvent<HTMLSelectElement>) => void;
   onCreateUserUsernameChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onDeleteUser: (user: UserResponse) => Promise<void>;
+  onDeleteTrustedCertificate: (certificate: TrustedCertificateResponse) => Promise<void>;
+  onEditTrustedCertificate: (certificate: TrustedCertificateResponse) => void;
   onResetPassword: (user: UserResponse) => Promise<void>;
   onRoleChange: (userId: string, role: UserRole) => Promise<void>;
+  onTrustedCertificateFieldChange: (field: keyof TrustedCertificateFormState, value: string | boolean) => void;
+  onTrustedCertificateSubmit: (event: FormEvent<HTMLFormElement>) => Promise<void>;
 }
 
 export function UsersPage({
@@ -27,13 +38,20 @@ export function UsersPage({
   isSubmitting,
   t,
   temporaryPasswordNotice,
+  trustedCertificateForm,
+  trustedCertificates,
   users,
+  onCancelTrustedCertificateEdit,
   onCreateUser,
   onCreateUserRoleChange,
   onCreateUserUsernameChange,
   onDeleteUser,
+  onDeleteTrustedCertificate,
+  onEditTrustedCertificate,
   onResetPassword,
-  onRoleChange
+  onRoleChange,
+  onTrustedCertificateFieldChange,
+  onTrustedCertificateSubmit
 }: UsersPageProps): ReactElement {
   return (
     <>
@@ -58,6 +76,17 @@ export function UsersPage({
         onDeleteUser={onDeleteUser}
         onResetPassword={onResetPassword}
         onRoleChange={onRoleChange}
+      />
+      <TrustedCertificatesPanel
+        certificates={trustedCertificates}
+        form={trustedCertificateForm}
+        isSubmitting={isSubmitting}
+        t={t}
+        onCancelEdit={onCancelTrustedCertificateEdit}
+        onDeleteCertificate={onDeleteTrustedCertificate}
+        onEditCertificate={onEditTrustedCertificate}
+        onFieldChange={onTrustedCertificateFieldChange}
+        onSubmit={onTrustedCertificateSubmit}
       />
     </>
   );

@@ -69,6 +69,25 @@ export type MessageKey =
   | "admin.passwordReset"
   | "admin.userDeleted"
   | "admin.confirmDelete"
+  | "certificates.alias"
+  | "certificates.cancelEdit"
+  | "certificates.confirmDelete"
+  | "certificates.create"
+  | "certificates.delete"
+  | "certificates.deleted"
+  | "certificates.disabled"
+  | "certificates.displayName"
+  | "certificates.edit"
+  | "certificates.enabled"
+  | "certificates.fingerprint"
+  | "certificates.issuer"
+  | "certificates.noCertificates"
+  | "certificates.pem"
+  | "certificates.save"
+  | "certificates.saved"
+  | "certificates.subject"
+  | "certificates.title"
+  | "certificates.validUntil"
   | "enrollment.tokens"
   | "enrollment.createToken"
   | "enrollment.suggestedName"
@@ -232,6 +251,25 @@ const englishMessages: Messages = {
   "admin.passwordReset": "Password reset.",
   "admin.userDeleted": "User deleted.",
   "admin.confirmDelete": "Delete this user?",
+  "certificates.alias": "Alias",
+  "certificates.cancelEdit": "Cancel",
+  "certificates.confirmDelete": "Delete this certificate?",
+  "certificates.create": "Add certificate",
+  "certificates.delete": "Delete certificate",
+  "certificates.deleted": "Certificate deleted.",
+  "certificates.disabled": "Disabled",
+  "certificates.displayName": "Display name",
+  "certificates.edit": "Edit certificate",
+  "certificates.enabled": "Enabled",
+  "certificates.fingerprint": "SHA-256 fingerprint",
+  "certificates.issuer": "Issuer",
+  "certificates.noCertificates": "No certificates configured.",
+  "certificates.pem": "PEM certificate",
+  "certificates.save": "Save certificate",
+  "certificates.saved": "Certificate saved.",
+  "certificates.subject": "Subject",
+  "certificates.title": "Trusted certificates",
+  "certificates.validUntil": "Valid until",
   "enrollment.tokens": "Enrollment tokens",
   "enrollment.createToken": "Create token",
   "enrollment.suggestedName": "Suggested name",
@@ -393,6 +431,25 @@ const germanMessages: Partial<Messages> = {
   "admin.passwordReset": "Passwort zurueckgesetzt.",
   "admin.userDeleted": "User geloescht.",
   "admin.confirmDelete": "Diesen User loeschen?",
+  "certificates.alias": "Alias",
+  "certificates.cancelEdit": "Abbrechen",
+  "certificates.confirmDelete": "Dieses Zertifikat loeschen?",
+  "certificates.create": "Zertifikat hinzufuegen",
+  "certificates.delete": "Zertifikat loeschen",
+  "certificates.deleted": "Zertifikat geloescht.",
+  "certificates.disabled": "Deaktiviert",
+  "certificates.displayName": "Anzeigename",
+  "certificates.edit": "Zertifikat bearbeiten",
+  "certificates.enabled": "Aktiviert",
+  "certificates.fingerprint": "SHA-256 Fingerprint",
+  "certificates.issuer": "Issuer",
+  "certificates.noCertificates": "Keine Zertifikate konfiguriert.",
+  "certificates.pem": "PEM-Zertifikat",
+  "certificates.save": "Zertifikat speichern",
+  "certificates.saved": "Zertifikat gespeichert.",
+  "certificates.subject": "Subject",
+  "certificates.title": "Vertrauenswuerdige Zertifikate",
+  "certificates.validUntil": "Gueltig bis",
   "enrollment.tokens": "Enrollment Tokens",
   "enrollment.createToken": "Token erstellen",
   "enrollment.suggestedName": "Vorgeschlagener Name",

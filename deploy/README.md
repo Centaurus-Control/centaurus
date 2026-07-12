@@ -23,6 +23,8 @@ Edit both files before running the deployment:
 - `.env` controls repository checkout, Docker build options, image names, and Compose paths.
 - `compose/.env` controls runtime ports, database credentials, application secrets, and public enrollment URLs.
 
+The default repository URL uses public HTTPS access and does not require a GitHub login while the repository is public. SSH URLs can still be used when the target host has an appropriate deploy key configured.
+
 The deployment script refuses to continue while required runtime values are missing or still contain `change-me` placeholders.
 
 ## Run
