@@ -68,9 +68,30 @@
 
         main {
             padding: 20px 0 32px;
+        }
+
+        .admin-layout {
             display: grid;
             grid-template-columns: 320px 1fr;
             gap: 16px;
+        }
+
+        .auth-view {
+            width: min(640px, 100%);
+            margin: 42px auto 0;
+            display: grid;
+            gap: 16px;
+        }
+
+        .auth-view section {
+            padding: 20px;
+        }
+
+        .auth-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 14px;
         }
 
         section,
@@ -352,7 +373,7 @@
         }
 
         @media (max-width: 840px) {
-            main {
+            .admin-layout {
                 grid-template-columns: 1fr;
             }
 
@@ -382,28 +403,7 @@
     </div>
 </header>
 <main>
-    <div class="stack">
-        <section id="loginPanel">
-            <div class="toolbar">
-                <h2>Login</h2>
-            </div>
-            <label for="serverUrl">Server URL</label>
-            <input id="serverUrl" placeholder="http://localhost:8080">
-            <label for="username">Username</label>
-            <input id="username" value="admin" autocomplete="username">
-            <label for="password">Password</label>
-            <input id="password" type="password" autocomplete="current-password">
-            <button id="loginButton" type="button">Login</button>
-        </section>
-
-        <section>
-            <div class="toolbar">
-                <h2>Status</h2>
-                <button id="refreshStatusButton" class="secondary" type="button">Refresh</button>
-            </div>
-            <div id="statusGrid" class="status-grid"></div>
-        </section>
-
+    <div id="enrollmentView" class="auth-view hidden">
         <section>
             <div class="toolbar">
                 <h2>Enrollment</h2>
@@ -412,86 +412,141 @@
             <textarea id="bundle" spellcheck="false"></textarea>
             <label for="displayName">Display name</label>
             <input id="displayName">
-            <button id="enrollButton" type="button">Enroll</button>
+            <div class="auth-actions">
+                <button id="enrollButton" type="button">Enroll</button>
+            </div>
+        </section>
+
+        <section>
+            <div class="toolbar">
+                <h2>Status</h2>
+                <button id="refreshEnrollmentStatusButton" class="secondary" type="button">Refresh</button>
+            </div>
+            <div id="enrollmentStatusGrid" class="status-grid"></div>
         </section>
     </div>
 
-    <div class="stack">
+    <div id="loginView" class="auth-view hidden">
         <section>
             <div class="toolbar">
-                <h2>Scripts</h2>
-                <div class="row">
-                    <button id="newScriptButton" class="secondary" type="button">New</button>
-                    <button id="publishManifestButton" class="secondary" type="button">Publish</button>
-                </div>
+                <h2>Admin Login</h2>
             </div>
-            <div id="scriptList" class="script-list"></div>
+            <label for="username">Username</label>
+            <input id="username" value="admin" autocomplete="username">
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password">
+            <div class="auth-actions">
+                <button id="loginButton" type="button">Login</button>
+            </div>
         </section>
 
         <section>
             <div class="toolbar">
-                <h2>Script Editor</h2>
-                <div class="row">
-                    <button id="saveScriptButton" type="button">Save</button>
-                    <button id="deleteScriptButton" class="danger" type="button">Delete</button>
-                </div>
+                <h2>Status</h2>
+                <button id="refreshLoginStatusButton" class="secondary" type="button">Refresh</button>
             </div>
-            <div class="form-grid">
-                <div>
-                    <label for="scriptId">ID</label>
-                    <input id="scriptId" placeholder="Generated on save">
-                </div>
-                <div>
-                    <label for="timeoutSeconds">Timeout seconds</label>
-                    <input id="timeoutSeconds" type="number" min="1" value="900">
-                </div>
-                <div>
-                    <label for="label">Label</label>
-                    <input id="label">
-                </div>
-                <div>
-                    <label for="command">Command</label>
-                    <div class="input-row">
-                        <input id="command" placeholder="/path/to/executable">
-                        <button id="browseCommandButton" class="secondary" type="button">Browse</button>
-                    </div>
-                </div>
-                <div class="span-2">
-                    <label for="description">Description</label>
-                    <input id="description">
-                </div>
-                <div class="span-2">
-                    <div class="toolbar">
-                        <h3>Server Parameters</h3>
-                        <button id="addParameterButton" class="secondary" type="button">Add</button>
-                    </div>
-                    <div id="parameterRows" class="builder"></div>
-                </div>
-                <div class="span-2">
-                    <label for="workingDirectory">Working directory</label>
-                    <input id="workingDirectory">
-                </div>
-                <div class="span-2">
-                    <div class="toolbar">
-                        <h3>Script Arguments</h3>
-                        <button id="addArgumentButton" class="secondary" type="button">Add</button>
-                    </div>
-                    <div id="argumentRows" class="builder"></div>
-                </div>
-                <div class="span-2">
-                    <label for="resultSchemaJson">Result schema JSON</label>
-                    <textarea id="resultSchemaJson">{}</textarea>
-                </div>
-            </div>
+            <div id="loginStatusGrid" class="status-grid"></div>
         </section>
+    </div>
 
+    <div id="authResultView" class="auth-view hidden">
         <section>
             <div class="toolbar">
                 <h2>Result</h2>
-                <button id="clearResultButton" class="secondary" type="button">Clear</button>
+                <button id="clearAuthResultButton" class="secondary" type="button">Clear</button>
             </div>
-            <pre id="result"></pre>
+            <pre id="authResult"></pre>
         </section>
+    </div>
+
+    <div id="adminView" class="admin-layout hidden">
+        <div class="stack">
+            <section>
+                <div class="toolbar">
+                    <h2>Status</h2>
+                    <button id="refreshAdminStatusButton" class="secondary" type="button">Refresh</button>
+                </div>
+                <div id="adminStatusGrid" class="status-grid"></div>
+            </section>
+
+            <section>
+                <div class="toolbar">
+                    <h2>Scripts</h2>
+                    <div class="row">
+                        <button id="newScriptButton" class="secondary" type="button">New</button>
+                        <button id="publishManifestButton" class="secondary" type="button">Publish</button>
+                    </div>
+                </div>
+                <div id="scriptList" class="script-list"></div>
+            </section>
+        </div>
+
+        <div class="stack">
+            <section>
+                <div class="toolbar">
+                    <h2>Script Editor</h2>
+                    <div class="row">
+                        <button id="saveScriptButton" type="button">Save</button>
+                        <button id="deleteScriptButton" class="danger" type="button">Delete</button>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div>
+                        <label for="scriptId">ID</label>
+                        <input id="scriptId" placeholder="Generated on save">
+                    </div>
+                    <div>
+                        <label for="timeoutSeconds">Timeout seconds</label>
+                        <input id="timeoutSeconds" type="number" min="1" value="900">
+                    </div>
+                    <div>
+                        <label for="label">Label</label>
+                        <input id="label">
+                    </div>
+                    <div>
+                        <label for="command">Command</label>
+                        <div class="input-row">
+                            <input id="command" placeholder="/path/to/executable">
+                            <button id="browseCommandButton" class="secondary" type="button">Browse</button>
+                        </div>
+                    </div>
+                    <div class="span-2">
+                        <label for="description">Description</label>
+                        <input id="description">
+                    </div>
+                    <div class="span-2">
+                        <div class="toolbar">
+                            <h3>Server Parameters</h3>
+                            <button id="addParameterButton" class="secondary" type="button">Add</button>
+                        </div>
+                        <div id="parameterRows" class="builder"></div>
+                    </div>
+                    <div class="span-2">
+                        <label for="workingDirectory">Working directory</label>
+                        <input id="workingDirectory">
+                    </div>
+                    <div class="span-2">
+                        <div class="toolbar">
+                            <h3>Script Arguments</h3>
+                            <button id="addArgumentButton" class="secondary" type="button">Add</button>
+                        </div>
+                        <div id="argumentRows" class="builder"></div>
+                    </div>
+                    <div class="span-2">
+                        <label for="resultSchemaJson">Result schema JSON</label>
+                        <textarea id="resultSchemaJson">{}</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="toolbar">
+                    <h2>Result</h2>
+                    <button id="clearResultButton" class="secondary" type="button">Clear</button>
+                </div>
+                <pre id="result"></pre>
+            </section>
+        </div>
     </div>
 </main>
 <div id="fileBrowser" class="modal-backdrop hidden">
@@ -511,6 +566,8 @@
 </div>
 <script>
     let authenticated = false;
+    let enrolled = false;
+    let latestStatus = null;
     let scripts = [];
     let selectedScriptId = null;
     let currentFileBrowserPath = null;
@@ -532,7 +589,9 @@
     }
 
     function showResult(value) {
-        $("result").textContent = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+        const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+        $("result").textContent = text;
+        $("authResult").textContent = text;
     }
 
     function setAuthenticated(value, session = null) {
@@ -540,6 +599,35 @@
         $("authPill").textContent = value ? `${session?.username || "Admin"}` : "Locked";
         $("authPill").className = value ? "pill ok" : "pill bad";
         $("logoutButton").classList.toggle("hidden", !value);
+        applyView();
+    }
+
+    function applyView() {
+        $("enrollmentView").classList.toggle("hidden", enrolled);
+        $("loginView").classList.toggle("hidden", !enrolled || authenticated);
+        $("authResultView").classList.toggle("hidden", authenticated);
+        $("adminView").classList.toggle("hidden", !enrolled || !authenticated);
+    }
+
+    function renderStatus(status) {
+        const fields = [
+            ["Enrolled", status.enrolled],
+            ["Connected", status.serverConnected],
+            ["Authenticated", status.serverAuthenticated],
+            ["Server", status.serverUrl || ""],
+            ["Agent ID", status.agentId || ""],
+            ["Machine ID", status.machineId || ""],
+            ["Config", status.configPath || ""]
+        ];
+        const html = fields.map(([label, value]) => `
+            <div class="status-item">
+                <span>${label}</span>
+                <strong>${typeof value === "boolean" ? (value ? "yes" : "no") : escapeHtml(value)}</strong>
+            </div>
+        `).join("");
+        ["enrollmentStatusGrid", "loginStatusGrid", "adminStatusGrid"].forEach(id => {
+            $(id).innerHTML = html;
+        });
     }
 
     async function loadSession() {
@@ -554,11 +642,11 @@
         const session = await api("/api/agent/ui/login", {
             method: "POST",
             body: JSON.stringify({
-                serverUrl: $("serverUrl").value,
                 username: $("username").value,
                 password: $("password").value
             })
         });
+        $("password").value = "";
         setAuthenticated(true, session);
         await loadScripts();
         showResult(session);
@@ -568,26 +656,15 @@
         await api("/api/agent/ui/logout", {method: "POST", body: "{}"});
         setAuthenticated(false);
         scripts = [];
+        selectedScriptId = null;
         renderScripts();
     }
 
     async function loadStatus() {
-        const status = await api("/api/agent/status");
-        $("serverUrl").placeholder = status.serverUrl || "http://localhost:8080";
-        const fields = [
-            ["Enrolled", status.enrolled],
-            ["Connected", status.serverConnected],
-            ["Authenticated", status.serverAuthenticated],
-            ["Agent ID", status.agentId || ""],
-            ["Machine ID", status.machineId || ""],
-            ["Config", status.configPath || ""]
-        ];
-        $("statusGrid").innerHTML = fields.map(([label, value]) => `
-            <div class="status-item">
-                <span>${label}</span>
-                <strong>${typeof value === "boolean" ? (value ? "yes" : "no") : value}</strong>
-            </div>
-        `).join("");
+        latestStatus = await api("/api/agent/status");
+        enrolled = Boolean(latestStatus.enrolled);
+        renderStatus(latestStatus);
+        applyView();
     }
 
     async function enroll() {
@@ -598,8 +675,10 @@
                 displayName: $("displayName").value
             })
         });
+        $("bundle").value = "";
         showResult(body);
         await loadStatus();
+        setAuthenticated(false);
     }
 
     async function loadScripts() {
@@ -969,13 +1048,16 @@
 
     $("loginButton").addEventListener("click", () => login().catch(error => showResult(error.message)));
     $("logoutButton").addEventListener("click", () => logout().catch(error => showResult(error.message)));
-    $("refreshStatusButton").addEventListener("click", () => loadStatus().catch(error => showResult(error.message)));
+    $("refreshEnrollmentStatusButton").addEventListener("click", () => loadStatus().catch(error => showResult(error.message)));
+    $("refreshLoginStatusButton").addEventListener("click", () => loadStatus().catch(error => showResult(error.message)));
+    $("refreshAdminStatusButton").addEventListener("click", () => loadStatus().catch(error => showResult(error.message)));
     $("enrollButton").addEventListener("click", () => enroll().catch(error => showResult(error.message)));
     $("newScriptButton").addEventListener("click", newScript);
     $("saveScriptButton").addEventListener("click", () => saveScript().catch(error => showResult(error.message)));
     $("deleteScriptButton").addEventListener("click", () => deleteScript().catch(error => showResult(error.message)));
     $("publishManifestButton").addEventListener("click", () => publishManifest().catch(error => showResult(error.message)));
     $("clearResultButton").addEventListener("click", () => showResult(""));
+    $("clearAuthResultButton").addEventListener("click", () => showResult(""));
     $("addParameterButton").addEventListener("click", addParameterRow);
     $("addArgumentButton").addEventListener("click", addArgumentRow);
     $("browseCommandButton").addEventListener("click", () => openFileBrowser().catch(error => showResult(error.message)));
@@ -984,8 +1066,9 @@
 
     renderParameterRows({});
     renderArgumentRows([]);
-    loadStatus().catch(error => showResult(error.message));
-    loadSession().catch(error => showResult(error.message));
+    loadStatus()
+        .then(() => enrolled ? loadSession() : setAuthenticated(false))
+        .catch(error => showResult(error.message));
 </script>
 </body>
 </html>

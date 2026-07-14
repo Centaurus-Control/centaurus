@@ -1,5 +1,6 @@
 package de.shadowsoft.centaurus.agent.auth;
 
+import de.shadowsoft.centaurus.agent.config.AgentConfigStore;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -14,9 +15,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AgentUiAuthFilter extends OncePerRequestFilter {
 
     private final AgentUiSessionService sessionService;
+    private final AgentConfigStore configStore;
 
-    public AgentUiAuthFilter(AgentUiSessionService sessionService) {
+    public AgentUiAuthFilter(AgentUiSessionService sessionService, AgentConfigStore configStore) {
         this.sessionService = sessionService;
+        this.configStore = configStore;
     }
 
     @Override
@@ -49,7 +52,14 @@ public class AgentUiAuthFilter extends OncePerRequestFilter {
         if (path.startsWith("/api/agent/ui/")) {
             return false;
         }
+        if (path.equals("/api/agent/enroll") && !isEnrolled()) {
+            return false;
+        }
         return true;
+    }
+
+    private boolean isEnrolled() {
+        return configStore.load().getAgentId() != null;
     }
 
     private String cookieValue(HttpServletRequest request) {
