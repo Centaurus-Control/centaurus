@@ -262,29 +262,6 @@ export interface ResetUserPasswordResponse {
   temporaryPassword: string;
 }
 
-export interface TrustedCertificateResponse {
-  id: string;
-  alias: string;
-  displayName: string;
-  certificatePem: string;
-  enabled: boolean;
-  subjectDn: string;
-  issuerDn: string;
-  serialNumber: string;
-  notBefore: string;
-  notAfter: string;
-  sha256Fingerprint: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface TrustedCertificateRequest {
-  alias: string;
-  displayName: string;
-  certificatePem: string;
-  enabled: boolean;
-}
-
 export interface EnrollmentTokenResponse {
   id: string;
   suggestedName: string | null;
@@ -560,65 +537,6 @@ export async function resetUserPassword(
 
 export async function deleteUser(userId: string, accessToken: string): Promise<void> {
   const response: Response = await fetch(`/api/admin/users/${userId}`, {
-    method: "DELETE",
-    credentials: "include",
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  });
-
-  if (!response.ok) {
-    throw await readError(response);
-  }
-}
-
-export async function listTrustedCertificates(accessToken: string): Promise<TrustedCertificateResponse[]> {
-  return requestJson<TrustedCertificateResponse[]>(
-    "/api/admin/trusted-certificates",
-    {
-      method: "GET"
-    },
-    accessToken
-  );
-}
-
-export async function createTrustedCertificate(
-  request: TrustedCertificateRequest,
-  accessToken: string
-): Promise<TrustedCertificateResponse> {
-  return requestJson<TrustedCertificateResponse>(
-    "/api/admin/trusted-certificates",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(request)
-    },
-    accessToken
-  );
-}
-
-export async function updateTrustedCertificate(
-  certificateId: string,
-  request: TrustedCertificateRequest,
-  accessToken: string
-): Promise<TrustedCertificateResponse> {
-  return requestJson<TrustedCertificateResponse>(
-    `/api/admin/trusted-certificates/${certificateId}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(request)
-    },
-    accessToken
-  );
-}
-
-export async function deleteTrustedCertificate(certificateId: string, accessToken: string): Promise<void> {
-  const response: Response = await fetch(`/api/admin/trusted-certificates/${certificateId}`, {
     method: "DELETE",
     credentials: "include",
     headers: {

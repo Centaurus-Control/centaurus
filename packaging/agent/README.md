@@ -41,9 +41,13 @@ Install on the target host:
 sudo mkdir -p /opt/centaurus-agent
 sudo tar -xzf centaurus-agent-linux-amd64-<version>.tar.gz -C /opt/centaurus-agent --strip-components=1
 cd /opt/centaurus-agent
-sudo ./install.sh
+sudo env \
+  CENTAURUS_AGENT_TRUSTED_CERTIFICATES_FILE=/path/to/centaurus-ca-bundle.pem \
+  ./install.sh
 ```
 
 Use the `arm64` archive for 64-bit Raspberry Pi OS, Debian, or Ubuntu on AArch64.
 
-The installer assumes the archive has already been unpacked to the final installation directory. It writes a `centaurus-agent` systemd service, runs it as `root`, and starts it immediately.
+The installer assumes the archive has already been unpacked to the final installation directory. It writes a `centaurus-agent` systemd service, runs it as `root`, imports a local PEM trust bundle when `CENTAURUS_AGENT_TRUSTED_CERTIFICATES_FILE` is set, and starts it immediately.
+
+For private CA environments, provide `CENTAURUS_AGENT_TRUSTED_CERTIFICATES_FILE` on first install. The Centaurus server URL itself is configured later through the Agent UI enrollment flow.

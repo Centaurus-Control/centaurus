@@ -55,8 +55,6 @@ public class SecurityConfig {
                     "/api/auth/refresh",
                     "/api/auth/logout",
                     "/api/agent/enroll",
-                    "/api/agent/trusted-certificates",
-                    "/api/agent/trusted-certificates/keytool-bundle",
                     "/agent/ws",
                     "/actuator/health"
                 ).permitAll()

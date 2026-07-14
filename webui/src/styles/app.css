@@ -567,129 +567,6 @@ dd {
   color: #9a2d1e;
 }
 
-.trustedCertificatesPanel {
-  align-content: start;
-}
-
-.trustedCertificateForm {
-  display: grid;
-  gap: 12px;
-}
-
-.trustedCertificateForm label,
-.certificateFormGrid label {
-  display: grid;
-  gap: 7px;
-  color: #43504c;
-  font-weight: 650;
-}
-
-.certificateFormGrid {
-  display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(180px, 1fr) minmax(120px, auto);
-  align-items: end;
-  gap: 12px;
-}
-
-.toggleLabel {
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  min-height: 42px;
-}
-
-.toggleLabel input {
-  width: auto;
-}
-
-.certificateTextarea {
-  min-height: 180px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 0.86rem;
-  line-height: 1.45;
-}
-
-.certificateFormActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.certificateFormActions button {
-  padding: 0 14px;
-}
-
-.certificateList {
-  display: grid;
-  gap: 12px;
-}
-
-.certificateRow {
-  display: grid;
-  gap: 12px;
-  border-top: 1px solid #edf1ef;
-  padding-top: 12px;
-}
-
-.certificateRowHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.certificateRowHeader div {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.certificateRowHeader span {
-  color: #65736f;
-  font-size: 0.82rem;
-}
-
-.statusPill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  border-radius: 999px;
-  padding: 0 10px;
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.enabledPill {
-  background: #dff0ea;
-  color: #1d664f;
-}
-
-.disabledPill {
-  background: #f2e2de;
-  color: #9a2d1e;
-}
-
-.certificateMetadata {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 16px;
-}
-
-.certificateMetadata div {
-  display: grid;
-  gap: 3px;
-  min-width: 0;
-}
-
-.certificateMetadata dd {
-  overflow-wrap: anywhere;
-  margin: 0;
-  color: #24312d;
-  font-size: 0.86rem;
-}
-
-.fingerprintText {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-}
-
 .dangerActionButton {
   display: inline-grid;
   align-items: center;
@@ -1061,8 +938,6 @@ dd {
   .machinesLayout,
   .machineDetail,
   .machineSummaryPanel,
-  .certificateFormGrid,
-  .certificateMetadata,
   .commandForms,
   .adminConfigGrid,
   .dashboardMachineGrid,

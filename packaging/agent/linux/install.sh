@@ -10,78 +10,104 @@ fail() {
   exit 1
 }
 
-download_to_file() {
-  local url="$1"
-  local target="$2"
-
-  if command -v curl >/dev/null 2>&1; then
-    curl --fail --location --show-error --silent --output "${target}" "${url}"
-  elif command -v wget >/dev/null 2>&1; then
-    wget --quiet --output-document="${target}" "${url}"
-  else
-    fail "curl or wget is required to download trusted certificates."
-  fi
-}
-
-import_trusted_certificates() {
-  local certificates_url="${CENTAURUS_AGENT_TRUSTED_CERTIFICATES_URL:-}"
+import_certificate_file() {
+  local alias="$1"
+  local certificate_file="$2"
   local java_home="${JAVA_HOME:-${INSTALL_DIR}/runtime}"
   local keytool="${java_home}/bin/keytool"
   local cacerts="${java_home}/lib/security/cacerts"
-  local tmp_dir
-  local bundle_file
-  local imported_count=0
-
-  if [[ -z "${certificates_url}" ]]; then
-    echo "No CENTAURUS_AGENT_TRUSTED_CERTIFICATES_URL configured; skipping trusted certificate import."
-    return
-  fi
 
   [[ -x "${keytool}" ]] || fail "keytool not found or not executable: ${keytool}"
   [[ -f "${cacerts}" ]] || fail "Java truststore not found: ${cacerts}"
-  command -v base64 >/dev/null 2>&1 || fail "base64 is required to import trusted certificates."
 
-  tmp_dir="$(mktemp -d)"
-  bundle_file="${tmp_dir}/trusted-certificates.txt"
-
-  echo "Downloading trusted certificates from ${certificates_url}..."
-  download_to_file "${certificates_url}" "${bundle_file}"
-
-  while IFS=$'\t' read -r alias certificate_base64; do
-    if [[ -z "${alias}" || "${alias}" == \#* ]]; then
-      continue
-    fi
-    if [[ -z "${certificate_base64}" ]]; then
-      fail "Invalid trusted certificate bundle line for alias: ${alias}"
-    fi
-
-    local certificate_file="${tmp_dir}/${alias}.pem"
-    printf '%s' "${certificate_base64}" | base64 --decode > "${certificate_file}" || fail "Could not decode certificate for alias: ${alias}"
-
-    if "${keytool}" -list \
-        -keystore "${cacerts}" \
-        -storepass "${KEYSTORE_PASSWORD}" \
-        -alias "${alias}" >/dev/null 2>&1; then
-
-      "${keytool}" -delete \
-        -keystore "${cacerts}" \
-        -storepass "${KEYSTORE_PASSWORD}" \
-        -alias "${alias}"
-    fi
-
-    "${keytool}" -importcert \
-      -trustcacerts \
-      -noprompt \
+  if "${keytool}" -list \
       -keystore "${cacerts}" \
       -storepass "${KEYSTORE_PASSWORD}" \
-      -alias "${alias}" \
-      -file "${certificate_file}"
+      -alias "${alias}" >/dev/null 2>&1; then
 
-    imported_count=$((imported_count + 1))
-  done < "${bundle_file}"
+    "${keytool}" -delete \
+      -keystore "${cacerts}" \
+      -storepass "${KEYSTORE_PASSWORD}" \
+      -alias "${alias}"
+  fi
+
+  "${keytool}" -importcert \
+    -trustcacerts \
+    -noprompt \
+    -keystore "${cacerts}" \
+    -storepass "${KEYSTORE_PASSWORD}" \
+    -alias "${alias}" \
+    -file "${certificate_file}"
+}
+
+split_pem_bundle() {
+  local source_file="$1"
+  local target_dir="$2"
+
+  awk -v target_dir="${target_dir}" '
+    /-----BEGIN CERTIFICATE-----/ {
+      in_cert = 1
+      count++
+      file = sprintf("%s/certificate-%03d.pem", target_dir, count)
+    }
+    in_cert {
+      print > file
+    }
+    /-----END CERTIFICATE-----/ {
+      in_cert = 0
+      close(file)
+    }
+    END {
+      if (in_cert) {
+        exit 2
+      }
+      if (count < 1) {
+        exit 3
+      }
+    }
+  ' "${source_file}"
+}
+
+resolve_install_dir_placeholders() {
+  local target_file="$1"
+  local escaped_install_dir="${INSTALL_DIR}"
+
+  escaped_install_dir="${escaped_install_dir//\\/\\\\}"
+  escaped_install_dir="${escaped_install_dir//&/\\&}"
+  escaped_install_dir="${escaped_install_dir//|/\\|}"
+
+  sed -i -e "s|{{INSTALL_DIR}}|${escaped_install_dir}|g" "${target_file}"
+
+  if grep -q "{{INSTALL_DIR}}" "${target_file}"; then
+    fail "Unresolved {{INSTALL_DIR}} placeholder in ${target_file}"
+  fi
+}
+
+import_local_trusted_certificates() {
+  local certificates_file="${CENTAURUS_AGENT_TRUSTED_CERTIFICATES_FILE:-}"
+  local tmp_dir
+  local index=0
+
+  if [[ -z "${certificates_file}" ]]; then
+    return
+  fi
+
+  [[ -f "${certificates_file}" ]] || fail "Trusted certificate file not found: ${certificates_file}"
+  command -v awk >/dev/null 2>&1 || fail "awk is required to import local trusted certificates."
+
+  tmp_dir="$(mktemp -d)"
+  if ! split_pem_bundle "${certificates_file}" "${tmp_dir}"; then
+    rm -rf "${tmp_dir}"
+    fail "Trusted certificate file must contain one or more PEM certificates."
+  fi
+
+  for certificate_file in "${tmp_dir}"/certificate-*.pem; do
+    index=$((index + 1))
+    import_certificate_file "centaurus-bootstrap-${index}" "${certificate_file}"
+  done
 
   rm -rf "${tmp_dir}"
-  echo "Imported ${imported_count} trusted certificate(s)."
+  echo "Imported ${index} local trusted certificate(s)."
 }
 
 if [[ "${EUID}" -ne 0 ]]; then
@@ -114,26 +140,26 @@ mkdir -p "${INSTALL_DIR}/agent-data" "${INSTALL_DIR}/logs"
 chmod +x "${INSTALL_DIR}/run-agent.sh"
 
 if [[ ! -f "${INSTALL_DIR}/.env" ]]; then
-  sed \
-    -e "s|{{INSTALL_DIR}}|${INSTALL_DIR}|g" \
-    "${INSTALL_DIR}/.env.example" > "${INSTALL_DIR}/.env"
+  cp "${INSTALL_DIR}/.env.example" "${INSTALL_DIR}/.env"
   chmod 0644 "${INSTALL_DIR}/.env"
 else
   echo "Keeping existing ${INSTALL_DIR}/.env"
 fi
 
-ENV_TRUSTED_CERTIFICATES_URL="${CENTAURUS_AGENT_TRUSTED_CERTIFICATES_URL:-}"
+resolve_install_dir_placeholders "${INSTALL_DIR}/.env"
+
+ENV_TRUSTED_CERTIFICATES_FILE="${CENTAURUS_AGENT_TRUSTED_CERTIFICATES_FILE:-}"
 
 set -a
 # shellcheck disable=SC1091
 source "${INSTALL_DIR}/.env"
 set +a
 
-if [[ -n "${ENV_TRUSTED_CERTIFICATES_URL}" ]]; then
-  CENTAURUS_AGENT_TRUSTED_CERTIFICATES_URL="${ENV_TRUSTED_CERTIFICATES_URL}"
+if [[ -n "${ENV_TRUSTED_CERTIFICATES_FILE}" ]]; then
+  CENTAURUS_AGENT_TRUSTED_CERTIFICATES_FILE="${ENV_TRUSTED_CERTIFICATES_FILE}"
 fi
 
-import_trusted_certificates
+import_local_trusted_certificates
 
 cat > "${SERVICE_FILE}" <<EOF
 [Unit]

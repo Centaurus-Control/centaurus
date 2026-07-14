@@ -5,10 +5,8 @@ import {
   createEnrollmentToken,
   createScriptButtonConfiguration,
   createStatusCheckConfiguration,
-  createTrustedCertificate,
   createUser,
   deleteAgent,
-  deleteTrustedCertificate,
   deleteUser,
   deleteScriptButtonConfiguration,
   deleteStatusCheckConfiguration,
@@ -28,7 +26,6 @@ import {
   listMachineScripts,
   listScriptButtonConfigurations,
   listStatusCheckConfigurations,
-  listTrustedCertificates,
   listUsers,
   login,
   logout,
@@ -40,7 +37,6 @@ import {
   streamMachineEvents,
   updateScriptButtonConfiguration,
   updateStatusCheckConfiguration,
-  updateTrustedCertificate,
   updateWakeOnLanConfiguration,
   updateUserRole,
   type ActuatorHealthResponse,
@@ -62,8 +58,6 @@ import {
   type ScriptDefinitionResponse,
   type StatusCheckConfigurationRequest,
   type StatusCheckConfigurationResponse,
-  type TrustedCertificateRequest,
-  type TrustedCertificateResponse,
   type UpdateWakeOnLanConfigurationRequest,
   type UserResponse,
   type UserRole
@@ -76,7 +70,6 @@ import {
 } from "../auth/tokenStore";
 import { type CreateUserFormState } from "../components/AdminUsersPanel";
 import { type ActiveView } from "../components/AppHeader";
-import { type TrustedCertificateFormState } from "../components/TrustedCertificatesPanel";
 import { translate, type LanguageCode, type MessageKey } from "../i18n/messages";
 import { type LoginFormState } from "../pages/LoginPage";
 import { type ScriptButtonConfigurationFormState, type StatusCheckConfigurationFormState } from "../pages/MachinesPage";
@@ -104,14 +97,6 @@ const initialPasswordChangeFormState: PasswordChangeFormState = {
 const initialCreateUserFormState: CreateUserFormState = {
   username: "",
   role: "OPERATOR"
-};
-
-const initialTrustedCertificateFormState: TrustedCertificateFormState = {
-  alias: "",
-  certificateId: null,
-  certificatePem: "",
-  displayName: "",
-  enabled: true
 };
 
 const initialEnrollmentTokenFormState: EnrollmentTokenFormState = {
@@ -171,10 +156,6 @@ export function useAppController() {
   const [statusCheckConfigurationForm, setStatusCheckConfigurationForm] =
     useState<StatusCheckConfigurationFormState>(initialStatusCheckConfigurationFormState);
   const [users, setUsers] = useState<UserResponse[]>([]);
-  const [trustedCertificates, setTrustedCertificates] = useState<TrustedCertificateResponse[]>([]);
-  const [trustedCertificateForm, setTrustedCertificateForm] = useState<TrustedCertificateFormState>(
-    initialTrustedCertificateFormState
-  );
   const [temporaryPasswordNotice, setTemporaryPasswordNotice] = useState<TemporaryPasswordNotice | null>(null);
   const [status, setStatus] = useState<ServerStatusResponse | null>(null);
   const [health, setHealth] = useState<ActuatorHealthResponse | null>(null);
@@ -223,22 +204,15 @@ export function useAppController() {
     setMachines(machineResponses);
 
     if (userResponse.role === "ADMIN") {
-      const [userResponses, tokenResponses, certificateResponses]: [
-        UserResponse[],
-        EnrollmentTokenResponse[],
-        TrustedCertificateResponse[]
-      ] = await Promise.all([
+      const [userResponses, tokenResponses]: [UserResponse[], EnrollmentTokenResponse[]] = await Promise.all([
         listUsers(token.accessToken),
-        listEnrollmentTokens(token.accessToken),
-        listTrustedCertificates(token.accessToken)
+        listEnrollmentTokens(token.accessToken)
       ]);
       setUsers(userResponses);
       setEnrollmentTokens(tokenResponses);
-      setTrustedCertificates(certificateResponses);
     } else {
       setUsers([]);
       setEnrollmentTokens([]);
-      setTrustedCertificates([]);
     }
   }, []);
 
@@ -327,18 +301,12 @@ export function useAppController() {
         await loadMachineDetails(selectedMachine.id, session.accessToken);
       }
       if (session.user?.role === "ADMIN") {
-        const [userResponses, tokenResponses, certificateResponses]: [
-          UserResponse[],
-          EnrollmentTokenResponse[],
-          TrustedCertificateResponse[]
-        ] = await Promise.all([
+        const [userResponses, tokenResponses]: [UserResponse[], EnrollmentTokenResponse[]] = await Promise.all([
           listUsers(session.accessToken),
-          listEnrollmentTokens(session.accessToken),
-          listTrustedCertificates(session.accessToken)
+          listEnrollmentTokens(session.accessToken)
         ]);
         setUsers(userResponses);
         setEnrollmentTokens(tokenResponses);
-        setTrustedCertificates(certificateResponses);
       }
     } catch (statusError: unknown) {
       setError(getErrorMessage(statusError));
@@ -429,8 +397,6 @@ export function useAppController() {
     setStatusCheckConfigurationForm(initialStatusCheckConfigurationFormState);
     setTemporaryPasswordNotice(null);
     setUsers([]);
-    setTrustedCertificates([]);
-    setTrustedCertificateForm(initialTrustedCertificateFormState);
     setIsPasswordChangeOpen(false);
     setIsAccountMenuOpen(false);
     setActiveView("dashboard");
@@ -500,16 +466,6 @@ export function useAppController() {
     setEnrollmentForm((currentForm: EnrollmentTokenFormState): EnrollmentTokenFormState => ({
       ...currentForm,
       expiresIn: event.target.value
-    }));
-  }
-
-  function handleTrustedCertificateFieldChange(
-    field: keyof TrustedCertificateFormState,
-    value: string | boolean
-  ): void {
-    setTrustedCertificateForm((currentForm: TrustedCertificateFormState): TrustedCertificateFormState => ({
-      ...currentForm,
-      [field]: value
     }));
   }
 
@@ -633,76 +589,6 @@ export function useAppController() {
       setError(getErrorMessage(createTokenError));
     } finally {
       setIsSubmitting(false);
-    }
-  }
-
-  async function handleTrustedCertificateSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
-    event.preventDefault();
-
-    if (session.accessToken === null) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-    setNotice(null);
-
-    try {
-      const request: TrustedCertificateRequest = {
-        alias: trustedCertificateForm.alias,
-        certificatePem: trustedCertificateForm.certificatePem,
-        displayName: trustedCertificateForm.displayName,
-        enabled: trustedCertificateForm.enabled
-      };
-      const savedCertificate: TrustedCertificateResponse =
-        trustedCertificateForm.certificateId === null
-          ? await createTrustedCertificate(request, session.accessToken)
-          : await updateTrustedCertificate(trustedCertificateForm.certificateId, request, session.accessToken);
-      setTrustedCertificates((currentCertificates: TrustedCertificateResponse[]): TrustedCertificateResponse[] =>
-        upsertTrustedCertificate(currentCertificates, savedCertificate).sort(compareTrustedCertificates)
-      );
-      setTrustedCertificateForm(initialTrustedCertificateFormState);
-      setNotice(t("certificates.saved"));
-    } catch (certificateError: unknown) {
-      setError(getErrorMessage(certificateError));
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
-
-  function handleEditTrustedCertificate(certificate: TrustedCertificateResponse): void {
-    setTrustedCertificateForm({
-      alias: certificate.alias,
-      certificateId: certificate.id,
-      certificatePem: certificate.certificatePem,
-      displayName: certificate.displayName,
-      enabled: certificate.enabled
-    });
-  }
-
-  function handleCancelTrustedCertificateEdit(): void {
-    setTrustedCertificateForm(initialTrustedCertificateFormState);
-  }
-
-  async function handleDeleteTrustedCertificate(certificate: TrustedCertificateResponse): Promise<void> {
-    if (session.accessToken === null || !window.confirm(t("certificates.confirmDelete"))) {
-      return;
-    }
-
-    setError(null);
-    setNotice(null);
-
-    try {
-      await deleteTrustedCertificate(certificate.id, session.accessToken);
-      setTrustedCertificates((currentCertificates: TrustedCertificateResponse[]): TrustedCertificateResponse[] =>
-        currentCertificates.filter((currentCertificate: TrustedCertificateResponse): boolean => currentCertificate.id !== certificate.id)
-      );
-      if (trustedCertificateForm.certificateId === certificate.id) {
-        setTrustedCertificateForm(initialTrustedCertificateFormState);
-      }
-      setNotice(t("certificates.deleted"));
-    } catch (deleteError: unknown) {
-      setError(getErrorMessage(deleteError));
     }
   }
 
@@ -1426,11 +1312,8 @@ export function useAppController() {
     status,
     t,
     temporaryPasswordNotice,
-    trustedCertificateForm,
-    trustedCertificates,
     users,
     handleCancelPasswordChange,
-    handleCancelTrustedCertificateEdit,
     handleConfirmPasswordChange,
     handleCreateUser,
     handleCreateUserRoleChange,
@@ -1441,10 +1324,8 @@ export function useAppController() {
     handleDeleteMachine,
     handleDeleteScriptButtonConfiguration,
     handleDeleteStatusCheckConfiguration,
-    handleDeleteTrustedCertificate,
     handleEditScriptButtonConfiguration,
     handleEditStatusCheckConfiguration,
-    handleEditTrustedCertificate,
     handleExecuteMachineFunction,
     handleExecuteScriptButtonConfiguration,
     handleLanguageChange,
@@ -1477,8 +1358,6 @@ export function useAppController() {
     handleStatusCheckConfigurationFieldChange,
     handleStatusCheckConfigurationParameterChange,
     handleStatusCheckConfigurationScriptChange,
-    handleTrustedCertificateFieldChange,
-    handleTrustedCertificateSubmit,
     handleSelectMachine,
     handleToggleAccountMenu,
     handleWakeOnLanInterfaceChange,
@@ -1798,26 +1677,6 @@ function parseScriptParameterSchema(parameterSchemaJson: string): ScriptParamete
 
 function compareUsers(leftUser: UserResponse, rightUser: UserResponse): number {
   return leftUser.username.localeCompare(rightUser.username);
-}
-
-function compareTrustedCertificates(
-  leftCertificate: TrustedCertificateResponse,
-  rightCertificate: TrustedCertificateResponse
-): number {
-  return leftCertificate.alias.localeCompare(rightCertificate.alias);
-}
-
-function upsertTrustedCertificate(
-  certificates: TrustedCertificateResponse[],
-  certificate: TrustedCertificateResponse
-): TrustedCertificateResponse[] {
-  if (certificates.some((currentCertificate: TrustedCertificateResponse): boolean => currentCertificate.id === certificate.id)) {
-    return certificates.map((currentCertificate: TrustedCertificateResponse): TrustedCertificateResponse =>
-      currentCertificate.id === certificate.id ? certificate : currentCertificate
-    );
-  }
-
-  return [...certificates, certificate];
 }
 
 function validatePasswordChangeForm(
