@@ -11,6 +11,14 @@ The recommended path is to download `centaurus-deploy-<version>.tar.gz` from the
 - Docker Compose plugin (`docker compose`)
 - Network access to the configured Git repository and base image registries
 
+On a fresh Debian host, the basic prerequisites can be installed with:
+
+```bash
+sudo ./debian/basic_setup.sh
+```
+
+The script uses Docker's official Debian apt repository and installs Docker Engine, Buildx, the Docker Compose plugin, Git, and the small command-line tools required by `deploy.sh`.
+
 ## Setup
 
 ```bash
