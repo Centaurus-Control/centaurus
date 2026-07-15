@@ -31,7 +31,7 @@ public class AgentUiAuthenticationService {
     }
 
     public AgentUiSessionService.AgentUiSession login(AgentUiLoginRequest request) {
-        String serverUrl = resolveServerUrl(request);
+        String serverUrl = resolveServerUrl();
         try {
             String loginJson = objectMapper.writeValueAsString(Map.of(
                 "username", request.username(),
@@ -70,15 +70,15 @@ public class AgentUiAuthenticationService {
         }
     }
 
-    private String resolveServerUrl(AgentUiLoginRequest request) {
-        if (StringUtils.hasText(request.serverUrl())) {
-            return trimTrailingSlash(request.serverUrl());
-        }
+    private String resolveServerUrl() {
         AgentConfig config = configStore.load();
+        if (config.getAgentId() == null) {
+            throw new AgentUiAuthenticationException("Agent is not enrolled");
+        }
         if (StringUtils.hasText(config.getServerUrl())) {
             return trimTrailingSlash(config.getServerUrl());
         }
-        throw new AgentUiAuthenticationException("serverUrl is required before enrollment");
+        throw new AgentUiAuthenticationException("Enrolled server URL is missing");
     }
 
     private String trimTrailingSlash(String value) {

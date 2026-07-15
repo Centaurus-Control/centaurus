@@ -17,7 +17,9 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 import java.net.http.WebSocket;
+import java.net.http.WebSocketHandshakeException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
@@ -156,13 +159,44 @@ public class AgentConnectionService {
             .whenComplete((socket, throwable) -> {
                 connecting.set(false);
                 if (throwable != null) {
-                    LOGGER.warn("Could not connect to Centaurus server WebSocket at {}", config.getWsUrl(), throwable);
+                    logConnectionFailure(config.getWsUrl(), throwable);
                     webSocket = null;
                     authenticated = false;
                     return;
                 }
                 webSocket = socket;
             });
+    }
+
+    private void logConnectionFailure(String wsUrl, Throwable throwable) {
+        WebSocketHandshakeException handshakeException = findHandshakeException(throwable);
+        if (handshakeException != null) {
+            HttpResponse<?> response = handshakeException.getResponse();
+            LOGGER.warn(
+                "Could not connect to Centaurus server WebSocket at {}. Handshake response status={} headers={}",
+                wsUrl,
+                response.statusCode(),
+                response.headers().map(),
+                throwable
+            );
+            return;
+        }
+        LOGGER.warn("Could not connect to Centaurus server WebSocket at {}", wsUrl, throwable);
+    }
+
+    private WebSocketHandshakeException findHandshakeException(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof WebSocketHandshakeException handshakeException) {
+                return handshakeException;
+            }
+            if (current instanceof CompletionException && current.getCause() != null) {
+                current = current.getCause();
+                continue;
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 
     private boolean isConnectionConfigComplete(AgentConfig config) {

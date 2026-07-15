@@ -39,6 +39,9 @@ public class AgentEnrollmentService {
 
     public EnrollAgentResponse enroll(EnrollAgentRequest request) {
         AgentConfig existingConfig = configStore.load();
+        if (existingConfig.getAgentId() != null) {
+            throw new EnrollmentException("Agent is already enrolled");
+        }
 
         EnrollmentBundle bundle = bundleParser.parse(request.enrollmentBundle());
         AgentIdentity identity = identityService.generateIdentity();

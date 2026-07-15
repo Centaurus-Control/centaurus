@@ -11,6 +11,14 @@ The recommended path is to download `centaurus-deploy-<version>.tar.gz` from the
 - Docker Compose plugin (`docker compose`)
 - Network access to the configured Git repository and base image registries
 
+On a fresh Debian host, the basic prerequisites can be installed with:
+
+```bash
+sudo ./debian/basic_setup.sh
+```
+
+The script uses Docker's official Debian apt repository and installs Docker Engine, Buildx, the Docker Compose plugin, Git, and the small command-line tools required by `deploy.sh`.
+
 ## Setup
 
 ```bash
@@ -23,7 +31,13 @@ Edit both files before running the deployment:
 - `.env` controls repository checkout, Docker build options, image names, and Compose paths.
 - `compose/.env` controls runtime ports, database credentials, application secrets, and public enrollment URLs.
 
+The default repository URL uses public HTTPS access and does not require a GitHub login while the repository is public. SSH URLs can still be used when the target host has an appropriate deploy key configured.
+
 The deployment script refuses to continue while required runtime values are missing or still contain `change-me` placeholders.
+
+By default, the runtime Compose file binds the Centaurus Server, Web UI, and PostgreSQL ports to `127.0.0.1`.
+This allows an existing host-level reverse proxy such as Nginx, Apache, or Caddy to terminate TLS and forward to the local ports without exposing the application containers directly on the LAN.
+For direct LAN testing, set the corresponding `*_BIND_ADDRESS` values in `compose/.env` to `0.0.0.0`.
 
 ## Run
 
